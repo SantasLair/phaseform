@@ -1,1 +1,6 @@
 node_modules/
+survey-shots/
+survey-*.json
+roundtrip-docs/
+roundtrip-*.json
+roundtrip*.log
