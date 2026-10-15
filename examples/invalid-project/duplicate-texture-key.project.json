@@ -1,0 +1,1 @@
+{"format":"phaseform-project","version":"0.1.0","name":"T","entry":"A","scenes":[{"key":"A","path":"scene.phaseform.json"}],"assets":[{"key":"x","type":"image","url":"a.png"},{"key":"x","type":"atlas","url":"b.png","atlasUrl":"b.json"}]}

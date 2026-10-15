@@ -1,0 +1,28 @@
+{
+  "format": "phaseform-project",
+  "version": "0.1.0",
+  "name": "Example Game",
+  "entry": "Level1",
+  "scenes": [
+    {
+      "key": "Level1",
+      "path": "03-sprites-and-hud.phaseform.json",
+      "assets": ["ground-tile", "coin", "hero", "panel", "jump"]
+    },
+    {
+      "key": "CoreFields",
+      "path": "05-core-fields.phaseform.json",
+      "assets": ["spark", "sky", "heart"]
+    }
+  ],
+  "assets": [
+    { "key": "ground-tile", "type": "image", "url": "assets/ground-tile.png" },
+    { "key": "panel", "type": "image", "url": "assets/panel.png" },
+    { "key": "coin", "type": "spritesheet", "url": "assets/coin.png", "frameWidth": 16, "frameHeight": 16, "frames": 4 },
+    { "key": "hero", "type": "atlas", "url": "assets/hero.png", "atlasUrl": "assets/hero.json" },
+    { "key": "spark", "type": "image", "url": "assets/spark.png" },
+    { "key": "sky", "type": "image", "url": "assets/sky.png" },
+    { "key": "heart", "type": "image", "url": "assets/heart.png" },
+    { "key": "jump", "type": "audio", "urls": ["assets/jump.ogg", "assets/jump.mp3"] }
+  ]
+}
