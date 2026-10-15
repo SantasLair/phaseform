@@ -1,0 +1,296 @@
+{
+  "date": "2026-10-15T17:56:14.492Z",
+  "results": {
+    "version": {
+      "phaser": "4.2.1",
+      "renderer": 2,
+      "WEBGL": 2,
+      "CANVAS": 1
+    },
+    "origins": {
+      "image": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "sprite": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "text": {
+        "originX": 0,
+        "originY": 0
+      },
+      "container": {
+        "originX": 0.5,
+        "originY": 0.5
+      },
+      "graphics": {}
+    },
+    "blendModes": {
+      "enum": {
+        "SKIP_CHECK": -1,
+        "NORMAL": 0,
+        "ADD": 1,
+        "MULTIPLY": 2,
+        "SCREEN": 3,
+        "OVERLAY": 4,
+        "DARKEN": 5,
+        "LIGHTEN": 6,
+        "COLOR_DODGE": 7,
+        "COLOR_BURN": 8,
+        "HARD_LIGHT": 9,
+        "SOFT_LIGHT": 10,
+        "DIFFERENCE": 11,
+        "EXCLUSION": 12,
+        "HUE": 13,
+        "SATURATION": 14,
+        "COLOR": 15,
+        "LUMINOSITY": 16,
+        "ERASE": 17,
+        "SOURCE_IN": 18,
+        "SOURCE_OUT": 19,
+        "SOURCE_ATOP": 20,
+        "DESTINATION_OVER": 21,
+        "DESTINATION_IN": 22,
+        "DESTINATION_OUT": 23,
+        "DESTINATION_ATOP": 24,
+        "LIGHTER": 25,
+        "COPY": 26,
+        "XOR": 27
+      },
+      "default": 0,
+      "byString": {
+        "NORMAL": 0,
+        "normal": 0,
+        "ADD": 1,
+        "add": 0,
+        "MULTIPLY": 2,
+        "SCREEN": 3,
+        "ERASE": 17,
+        "OVERLAY": 4,
+        "bogus": 0
+      }
+    },
+    "angleRotation": {
+      "angle90_rotation": 1.5707963267948966,
+      "rotationPi_angle": -180,
+      "angle270_angle": -90,
+      "rotation3Pi": {
+        "rotation": -3.141592653589793,
+        "angle": -180
+      }
+    },
+    "textStyle": {
+      "json": {
+        "fontFamily": "Courier",
+        "fontSize": "16px",
+        "fontStyle": "",
+        "backgroundColor": null,
+        "color": "#fff",
+        "stroke": "#fff",
+        "strokeThickness": 0,
+        "shadowOffsetX": 0,
+        "shadowOffsetY": 0,
+        "shadowColor": "#000",
+        "shadowBlur": 0,
+        "shadowStroke": false,
+        "shadowFill": false,
+        "align": "left",
+        "maxLines": 0,
+        "fixedWidth": 0,
+        "fixedHeight": 0,
+        "resolution": 1,
+        "rtl": false,
+        "testString": "|MÃ‰qgy",
+        "baselineX": 1.2,
+        "baselineY": 1.4,
+        "wordWrapWidth": null,
+        "wordWrapCallback": null,
+        "wordWrapCallbackScope": null,
+        "wordWrapUseAdvanced": false,
+        "metrics": {
+          "ascent": 12,
+          "descent": 3,
+          "fontSize": 15
+        }
+      },
+      "padding": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "fontSizeNumber": "24px"
+    },
+    "tint": {
+      "TintModes": {
+        "MULTIPLY": 0,
+        "FILL": 1,
+        "ADD": 2,
+        "SCREEN": 4,
+        "OVERLAY": 5,
+        "HARD_LIGHT": 6,
+        "MULTIPLY_TWO": 7
+      },
+      "before": {
+        "tint": 16777215,
+        "mode": 0,
+        "isTinted": false
+      },
+      "one": {
+        "tint": 16711680,
+        "tl": 16711680,
+        "br": 16711680,
+        "mode": 0,
+        "isTinted": true
+      },
+      "four": {
+        "tl": 16711680,
+        "tr": 65280,
+        "bl": 255,
+        "br": 16777215
+      },
+      "afterFill": 1,
+      "hasSetTintFill": "function",
+      "textHasTint": "function",
+      "containerHasTint": "undefined"
+    },
+    "containerSize": {
+      "withChild": {
+        "w": 0,
+        "h": 0,
+        "dw": 0,
+        "dh": 0
+      },
+      "empty": {
+        "w": 0,
+        "h": 0
+      },
+      "hasSetOrigin": "undefined",
+      "hasFlipX": "undefined"
+    },
+    "frames": {
+      "singleDefaultFrame": "__BASE",
+      "sheetDefaultFrame": 0,
+      "byIndexFrame": 1,
+      "byBaseName": "__BASE",
+      "missingFrame": 0,
+      "frameNames": [
+        "0",
+        "1"
+      ]
+    },
+    "containerDepth": {
+      "listOrder": [
+        10,
+        0
+      ],
+      "childDepthStillStored": 10,
+      "sortChildrenExists": "function",
+      "note": "rendering order checked in pixel test"
+    },
+    "containerScrollFactor": {
+      "afterPlain": {
+        "con": 0.5,
+        "child": 1
+      },
+      "afterFlag": {
+        "con": 0.5,
+        "child": 1
+      },
+      "defaultScrollFactor": [
+        1,
+        1
+      ]
+    },
+    "size": {
+      "game": {
+        "w": 800,
+        "h": 600
+      },
+      "camera": {
+        "w": 800,
+        "h": 600
+      }
+    },
+    "commonDefaults": {
+      "alpha": 1,
+      "visible": true,
+      "depth": 0,
+      "active": true,
+      "name": "",
+      "scale": [
+        1,
+        1
+      ],
+      "flip": [
+        false,
+        false
+      ],
+      "dataBeforeUse": null
+    },
+    "pixels": {
+      "containerOverlap": {
+        "r": 0,
+        "g": 0,
+        "b": 255,
+        "a": 255
+      },
+      "rootOverlap": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "blend_NORMAL": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "blend_ADD": {
+        "r": 255,
+        "g": 128,
+        "b": 128,
+        "a": 255
+      },
+      "blend_MULTIPLY": {
+        "r": 128,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "blend_SCREEN": {
+        "r": 255,
+        "g": 128,
+        "b": 128,
+        "a": 255
+      },
+      "blend_OVERLAY": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "blend_DIFFERENCE": {
+        "r": 255,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      },
+      "blend_ERASE": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 255
+      }
+    }
+  },
+  "logs": [
+    "warning: Texture \"%s\" has no frame \"%s\" sheet nope",
+    "warning: [.WebGL-0x3a6400188800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x3a6400188800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x3a6400188800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x3a6400188800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+}

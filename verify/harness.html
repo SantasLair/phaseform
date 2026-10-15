@@ -1,0 +1,168 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform verify</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Each check returns plain JSON. Results land in window.__results.
+window.__results = null;
+
+class Probe extends Phaser.Scene {
+  constructor() { super('Probe'); }
+  create() {
+    const r = {};
+    const safe = (name, fn) => { try { r[name] = fn(); } catch (e) { r[name] = { error: String(e) }; } };
+
+    // textures: a single image and a 2-frame spritesheet
+    const c = this.textures.createCanvas('tex', 32, 32);
+    c.context.fillStyle = '#f0f'; c.context.fillRect(0, 0, 32, 32); c.refresh();
+    const s = this.textures.createCanvas('sheet', 64, 32);
+    s.context.fillStyle = '#0ff'; s.context.fillRect(0, 0, 64, 32); s.refresh();
+    this.textures.get('sheet').add(0, 0, 0, 0, 32, 32);
+    this.textures.get('sheet').add(1, 0, 32, 0, 32, 32);
+
+    safe('version', () => ({ phaser: Phaser.VERSION, renderer: this.game.renderer.type, WEBGL: Phaser.WEBGL, CANVAS: Phaser.CANVAS }));
+
+    // 1. default origins
+    safe('origins', () => {
+      const o = {};
+      const img = this.add.image(0, 0, 'tex');
+      const spr = this.add.sprite(0, 0, 'tex');
+      const txt = this.add.text(0, 0, 'hi');
+      const con = this.add.container(0, 0);
+      const gfx = this.add.graphics();
+      for (const [k, v] of Object.entries({ image: img, sprite: spr, text: txt, container: con, graphics: gfx })) {
+        o[k] = { originX: v.originX, originY: v.originY };
+      }
+      return o;
+    });
+
+    // 2. blend modes
+    safe('blendModes', () => {
+      const img = this.add.image(0, 0, 'tex');
+      const out = { enum: { ...Phaser.BlendModes }, default: img.blendMode, byString: {} };
+      for (const name of ['NORMAL', 'normal', 'ADD', 'add', 'MULTIPLY', 'SCREEN', 'ERASE', 'OVERLAY', 'bogus']) {
+        try { img.setBlendMode(name); out.byString[name] = img.blendMode; } catch (e) { out.byString[name] = { error: String(e) }; }
+      }
+      return out;
+    });
+
+    // 3. angle vs rotation
+    safe('angleRotation', () => {
+      const img = this.add.image(0, 0, 'tex');
+      img.angle = 90; const a = img.rotation;
+      img.rotation = Math.PI; const b = img.angle;
+      img.angle = 270; const c2 = img.angle;
+      img.rotation = Math.PI * 3; const d = { rotation: img.rotation, angle: img.angle };
+      return { angle90_rotation: a, rotationPi_angle: b, angle270_angle: c2, rotation3Pi: d };
+    });
+
+    // 4. text style defaults
+    safe('textStyle', () => {
+      const t = this.add.text(0, 0, 'hi');
+      const st = t.style;
+      return { json: st.toJSON(), padding: t.padding, resolution: t.resolution, fontSizeNumber: (() => { const x = this.add.text(0, 0, 'a', { fontSize: 24 }); return x.style.fontSize; })() };
+    });
+
+    // 5. tint
+    safe('tint', () => {
+      const img = this.add.image(0, 0, 'tex');
+      const before = { tint: img.tint, mode: img.tintMode, isTinted: img.isTinted };
+      img.setTint(0xff0000);
+      const one = { tint: img.tint, tl: img.tintTopLeft, br: img.tintBottomRight, mode: img.tintMode, isTinted: img.isTinted };
+      img.setTint(0xff0000, 0x00ff00, 0x0000ff, 0xffffff);
+      const four = { tl: img.tintTopLeft, tr: img.tintTopRight, bl: img.tintBottomLeft, br: img.tintBottomRight };
+      img.setTintMode(Phaser.TintModes.FILL);
+      return { TintModes: { ...Phaser.TintModes }, before, one, four, afterFill: img.tintMode, hasSetTintFill: typeof img.setTintFill,
+               textHasTint: typeof this.add.text(0, 0, 'a').setTint, containerHasTint: typeof this.add.container().setTint };
+    });
+
+    // 6. container size
+    safe('containerSize', () => {
+      const con = this.add.container(0, 0, [this.add.image(0, 0, 'tex')]);
+      const empty = this.add.container(0, 0);
+      return { withChild: { w: con.width, h: con.height, dw: con.displayWidth, dh: con.displayHeight }, empty: { w: empty.width, h: empty.height }, hasSetOrigin: typeof con.setOrigin, hasFlipX: typeof con.setFlipX };
+    });
+
+    // 7. frames
+    safe('frames', () => {
+      const img = this.add.image(0, 0, 'tex');
+      const sheet = this.add.sprite(0, 0, 'sheet');
+      const byIndex = this.add.sprite(0, 0, 'sheet', 1);
+      const byName = (() => { try { return this.add.sprite(0, 0, 'tex', '__BASE').frame.name; } catch (e) { return String(e); } })();
+      const missing = (() => { try { const m = this.add.sprite(0, 0, 'sheet', 'nope'); return m.frame.name; } catch (e) { return String(e); } })();
+      return { singleDefaultFrame: img.frame.name, sheetDefaultFrame: sheet.frame.name, byIndexFrame: byIndex.frame.name, byBaseName: byName, missingFrame: missing, frameNames: this.textures.get('sheet').getFrameNames() };
+    });
+
+    // 8. container child draw order vs child depth
+    safe('containerDepth', () => {
+      const a = this.add.image(0, 0, 'tex').setDepth(10);
+      const b = this.add.image(0, 0, 'tex').setDepth(0);
+      const con = this.add.container(0, 0, [a, b]);
+      const hasChildDepth = a.depth;
+      return { listOrder: con.list.map(o => o.depth), childDepthStillStored: hasChildDepth, sortChildrenExists: typeof con.sort, note: 'rendering order checked in pixel test' };
+    });
+
+    // 9. scrollFactor on containers
+    safe('containerScrollFactor', () => {
+      const child = this.add.image(0, 0, 'tex');
+      const con = this.add.container(0, 0, [child]);
+      con.setScrollFactor(0.5);
+      const afterPlain = { con: con.scrollFactorX, child: child.scrollFactorX };
+      con.setScrollFactor(0.5, 0.5, true);
+      const afterFlag = { con: con.scrollFactorX, child: child.scrollFactorX };
+      const def = this.add.image(0, 0, 'tex');
+      return { afterPlain, afterFlag, defaultScrollFactor: [def.scrollFactorX, def.scrollFactorY] };
+    });
+
+    // 10. camera/game size
+    safe('size', () => ({ game: { w: this.scale.gameSize.width, h: this.scale.gameSize.height }, camera: { w: this.cameras.main.width, h: this.cameras.main.height } }));
+
+    // misc defaults
+    safe('commonDefaults', () => {
+      const img = this.add.image(0, 0, 'tex');
+      return { alpha: img.alpha, visible: img.visible, depth: img.depth, active: img.active, name: img.name, scale: [img.scaleX, img.scaleY], flip: [img.flipX, img.flipY], dataBeforeUse: img.data };
+    });
+
+    // pixel tests: need real rendering
+    const gray = this.textures.createCanvas('gray', 32, 32);
+    gray.context.fillStyle = '#808080'; gray.context.fillRect(0, 0, 32, 32); gray.refresh();
+    const red = this.textures.createCanvas('red', 32, 32);
+    red.context.fillStyle = '#ff0000'; red.context.fillRect(0, 0, 32, 32); red.refresh();
+    const blue = this.textures.createCanvas('blue', 32, 32);
+    blue.context.fillStyle = '#0000ff'; blue.context.fillRect(0, 0, 32, 32); blue.refresh();
+    const probes = {};
+    // container: red depth 10 listed first, blue depth 0 listed second, same spot
+    const cr = this.add.image(0, 0, 'red').setDepth(10);
+    const cb = this.add.image(0, 0, 'blue').setDepth(0);
+    this.add.container(100, 100, [cr, cb]);
+    probes.containerOverlap = [100, 100];
+    // scene root: red depth 10 added first, blue depth 0 added second
+    this.add.image(300, 100, 'red').setDepth(10);
+    this.add.image(300, 100, 'blue').setDepth(0);
+    probes.rootOverlap = [300, 100];
+    // blend modes: gray backdrop, red image on top with each mode
+    let x = 100;
+    for (const name of ['NORMAL', 'ADD', 'MULTIPLY', 'SCREEN', 'OVERLAY', 'DIFFERENCE', 'ERASE']) {
+      this.add.image(x, 300, 'gray');
+      this.add.image(x, 300, 'red').setBlendMode(Phaser.BlendModes[name]);
+      probes['blend_' + name] = [x, 300];
+      x += 60;
+    }
+    const out = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { r.pixels = out; window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (c) => {
+          out[k] = { r: c.red, g: c.green, b: c.blue, a: c.alpha };
+          this.time.delayedCall(50, next);
+        });
+      };
+      next();
+    });
+  }
+}
+
+new Phaser.Game({ type: Phaser.WEBGL, width: 800, height: 600, scene: Probe, banner: false, audio: { noAudio: true } });
+</script>
