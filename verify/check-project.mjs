@@ -1,4 +1,4 @@
-// Checks the PROJECT.md rules that JSON Schema cannot express. Prototype of the loader's validation pass.
+// Checks the docs/PROJECT.md rules that JSON Schema cannot express. Prototype of the loader's validation pass.
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 

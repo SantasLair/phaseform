@@ -1,6 +1,6 @@
 # PHASEFORM Project
 
-**Companion spec to [README.md](README.md). Draft v0.1.**
+**Companion spec to [SPEC.md](SPEC.md). Draft v0.1.**
 
 A scene file describes one scene and refers to assets only by key. A **project file** ties scenes together: it lists the scenes, says which one starts, and maps asset keys to files. Scenes stay self-contained and valid on their own. The project file is what makes a set of scenes loadable.
 
@@ -81,7 +81,7 @@ Anything else (bitmap fonts, tilemaps, video, scripts) is an unknown type in v0.
 
 A reference loader does roughly this:
 
-1. Read the project file and validate it against `phaseform.project.schema.json`.
+1. Read the project file and validate it against [phaseform.project.schema.json](../phaseform.project.schema.json).
 2. Create the Phaser game using the `size` of the entry scene.
 3. For each scene, queue the loader calls for its assets (all assets, or the scene's `assets` list).
 4. After loading, build each scene's objects as described in the scene spec.

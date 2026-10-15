@@ -2,7 +2,7 @@
 
 Does the PHASEFORM v0.1 core describe real Phaser scenes well enough to rebuild them? Each official example is run on Phaser 4.2.1 (WebGL), paused after `create()`, serialized to a PHASEFORM document, validated against the schema, rebuilt in the same page by the reference loader, and compared pixel for pixel with the original frame.
 
-Tools (all in `verify/`): `phaseform-serialize.js` (live scene to document), `phaseform-load.js` (document to scene), `roundtrip.mjs` (runner), `roundtrip-report.mjs` (summary). Examples: [phaserjs/examples](https://github.com/phaserjs/examples) commit `68140eca` (MIT code). Same 259 examples as [SURVEY.md](SURVEY.md). Run date: 2026-10-15.
+Tools (all in [verify/](../verify/)): `phaseform-serialize.js` (live scene to document), `phaseform-load.js` (document to scene), `roundtrip.mjs` (runner), `roundtrip-report.mjs` (summary). Examples: [phaserjs/examples](https://github.com/phaserjs/examples) commit `68140eca` (MIT code). Same 259 examples as [SURVEY.md](SURVEY.md). Run date: 2026-10-15.
 
 ## Results
 
@@ -34,7 +34,7 @@ The other 159 contain an object type the core does not have, mostly `Graphics` (
 ## What the round-trip changed in the spec
 
 Bugs found by running real examples, all now fixed:
-1. **Container blend mode default.** A Phaser container's blend mode is `SKIP_CHECK` (-1), not normal. The README said every object defaults to `normal`.
+1. **Container blend mode default.** A Phaser container's blend mode is `SKIP_CHECK` (-1), not normal. The spec said every object defaults to `normal`.
 2. **Text `style.metrics`.** Phaser uses supplied metrics instead of measuring, which changes text height (53 vs 55 px in one example). The first serializer discarded it.
 3. **Style shape.** `style` must be Phaser's config form (nested `shadow` and `wordWrap`, `padding` inside), not the flat form that `toJSON()` produces.
 

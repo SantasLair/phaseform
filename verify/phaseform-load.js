@@ -1,5 +1,5 @@
 // Prototype PHASEFORM reference loader: PHASEFORM v0.1 scene document -> objects in a live Phaser 4 scene.
-// Follows README.md: defaults, validation of blend/tint names and frames, container draw order.
+// Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order.
 window.PhaseformLoader = (function () {
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
   const TINT = { multiply: 'MULTIPLY', fill: 'FILL', add: 'ADD', screen: 'SCREEN', overlay: 'OVERLAY', 'hard-light': 'HARD_LIGHT' };

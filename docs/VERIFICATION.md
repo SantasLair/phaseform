@@ -42,4 +42,4 @@ Run on 2026-10-15: Phaser **4.2.1**, WebGL renderer (SwiftShader), Chrome 155. R
 - Unresolved edge: whether `setTintFill` is deprecated or kept; check the changelog if the spec ever needs to mention it.
 
 ## Add new items here
-When a spec decision rests on an assumption, add a row instead of writing it into the README as fact.
+When a spec decision rests on an assumption, add a row instead of writing it into the spec as fact.

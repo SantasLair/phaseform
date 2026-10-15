@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://phaseform.dev/schema/0.1.0/phaseform.project.schema.json",
   "title": "PHASEFORM project",
-  "description": "A PHASEFORM v0.1 project file: scene list, entry scene and asset manifest. Structure only: key uniqueness, entry membership, texture references and scene key matching are defined in PROJECT.md and enforced by the loader.",
+  "description": "A PHASEFORM v0.1 project file: scene list, entry scene and asset manifest. Structure only: key uniqueness, entry membership, texture references and scene key matching are defined in docs/PROJECT.md and enforced by the loader.",
   "type": "object",
   "required": ["format", "version", "name", "entry", "scenes", "assets"],
   "properties": {

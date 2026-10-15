@@ -1,7 +1,7 @@
 {
   "name": "phaseform-verify",
   "private": true,
-  "description": "Harness that checks undocumented Phaser behavior referenced by VERIFICATION.md",
+  "description": "Harness that checks undocumented Phaser behavior referenced by docs/VERIFICATION.md",
   "scripts": {
     "verify": "node run.mjs",
     "validate": "node validate.mjs"

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://phaseform.dev/schema/0.1.0/phaseform.schema.json",
   "title": "PHASEFORM scene",
-  "description": "A PHASEFORM v0.1 scene document for Phaser 4. Structure only: behavior (draw order, defaults, id uniqueness, valid frames, asset resolution) is defined in README.md and must be enforced by the loader.",
+  "description": "A PHASEFORM v0.1 scene document for Phaser 4. Structure only: behavior (draw order, defaults, id uniqueness, valid frames, asset resolution) is defined in docs/SPEC.md and must be enforced by the loader.",
   "type": "object",
   "required": ["format", "version", "key", "size", "objects"],
   "properties": {
