@@ -14,13 +14,15 @@
 
 ## Roadmap
 
-1. ~~Core types and conventions for v0.1.~~ Done, pending the questions above.
-2. ~~Project and asset manifest spec.~~ Done: [PROJECT.md](PROJECT.md).
-3. ~~JSON Schemas for v0.1.~~ Drafted. `npm run validate` in `verify/` checks the examples.
-4. ~~Prototype loader and serializer with round-trip tests.~~ Done in `verify/`. A production loader is still to do.
-5. Extend the core using the survey results, starting with graphics commands.
-6. Conformance examples for other editors to check against.
-7. First implementation: an editor that exports and imports PHASEFORM.
+Legend: `[x]` done, `[~]` partial, `[ ]` not started.
+
+1. [~] Core types and conventions for v0.1. Settled, pending the questions above.
+2. [x] Project and asset manifest spec: [PROJECT.md](PROJECT.md).
+3. [~] JSON Schemas for v0.1. Drafted. `npm run validate` in `verify/` checks the examples.
+4. [~] Prototype loader and serializer with round-trip tests. Prototype done in `verify/`. A production loader is still to do.
+5. [ ] Extend the core using the survey results, starting with graphics commands.
+6. [ ] Conformance examples for other editors to check against.
+7. [ ] First implementation: an editor that exports and imports PHASEFORM.
 
 ## Naming notes
 
