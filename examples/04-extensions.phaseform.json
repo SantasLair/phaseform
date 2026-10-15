@@ -25,7 +25,7 @@
       "tint": "#ffcc66",
       "extensions": {
         "arcade": { "body": "dynamic", "bounce": 0.2 },
-        "editor-hints": { "lockedInEditor": true }
+        "audio-cue": { "onSpawn": "thud" }
       }
     },
     {

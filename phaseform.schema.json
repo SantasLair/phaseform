@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://phaseform.dev/schema/0.1.0/phaseform.schema.json",
   "title": "PHASEFORM scene",
-  "description": "A PHASEFORM v0.1 scene document. Structure only: behavior (draw order, coordinate conventions, id uniqueness, asset resolution) is defined in README.md and must be enforced by the loader.",
+  "description": "A PHASEFORM v0.1 scene document for Phaser 4. Structure only: behavior (draw order, defaults, id uniqueness, valid frames, asset resolution) is defined in README.md and must be enforced by the loader.",
   "type": "object",
   "required": ["format", "version", "key", "size", "objects"],
   "properties": {
@@ -26,7 +26,8 @@
         "width": { "type": "number", "exclusiveMinimum": 0 },
         "height": { "type": "number", "exclusiveMinimum": 0 }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "description": "Game size in pixels (the Phaser game config width and height). All scenes in a game should agree."
     },
     "background": {
       "type": "string",
@@ -35,7 +36,7 @@
     "objects": {
       "type": "array",
       "items": { "$ref": "#/$defs/object" },
-      "description": "Ordered list of objects. Later objects draw on top of earlier ones at equal depth."
+      "description": "Ordered list of objects. At the scene root, draw order is depth, then list position."
     },
     "extensions": {
       "$ref": "#/$defs/extensions"
@@ -52,7 +53,7 @@
       "description": "Extension data keyed by lowercase extension name. Loaders must preserve extensions they do not understand."
     },
 
-    "point": {
+    "vec2": {
       "type": "object",
       "required": ["x", "y"],
       "properties": {
@@ -65,7 +66,17 @@
     "color": {
       "type": "string",
       "pattern": "^#[0-9a-fA-F]{6}$",
-      "description": "Tint color as #rrggbb. Provisional: the spec does not yet fix the tint representation."
+      "description": "Color as #rrggbb. Converted to Phaser's numeric tint."
+    },
+
+    "tintMode": {
+      "enum": ["multiply", "fill", "add", "screen", "overlay", "hard-light"],
+      "description": "Maps to Phaser's TintModes. Default multiply."
+    },
+
+    "blendMode": {
+      "enum": ["normal", "add", "multiply", "screen"],
+      "description": "The blend modes WebGL renders natively. Default normal. Phaser silently treats unknown names as normal, so loaders must reject unknown values."
     },
 
     "object": {
@@ -82,44 +93,78 @@
           "minLength": 1,
           "description": "Object type. Open registry: unknown types are valid and must be preserved."
         },
+        "name": { "type": "string", "default": "" },
         "x": { "type": "number", "default": 0 },
         "y": { "type": "number", "default": 0 },
-        "depth": { "type": "number", "default": 0 },
+        "depth": {
+          "type": "number",
+          "default": 0,
+          "description": "Draw order at the scene root. Ignored for children of a container, where list order decides."
+        },
         "alpha": { "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
         "visible": { "type": "boolean", "default": true },
+        "active": { "type": "boolean", "default": true },
+        "scrollFactor": {
+          "$ref": "#/$defs/vec2",
+          "description": "Default {1, 1}. On a container it affects the container only."
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Free key/value data applied with the game object's data manager."
+        },
         "scripts": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "Script paths to attach."
+          "description": "Script paths to attach, relative to the project root."
         },
         "extensions": { "$ref": "#/$defs/extensions" },
         "children": {
           "type": "array",
           "items": { "$ref": "#/$defs/object" },
           "description": "Child objects. Valid only for type container."
-        }
+        },
+
+        "origin": { "$ref": "#/$defs/vec2", "description": "Default {0.5, 0.5} for image and sprite, {0, 0} for text. Invalid on container." },
+        "scale": { "$ref": "#/$defs/vec2", "description": "Default {1, 1}." },
+        "rotation": { "type": "number", "default": 0, "description": "Radians. Phaser normalizes to between -pi and pi." },
+        "flipX": { "type": "boolean", "default": false },
+        "flipY": { "type": "boolean", "default": false },
+        "tint": { "$ref": "#/$defs/color", "description": "Default #ffffff. Invalid on container." },
+        "tintMode": { "$ref": "#/$defs/tintMode" },
+        "blendMode": { "$ref": "#/$defs/blendMode" }
       },
       "additionalProperties": true,
       "allOf": [
         {
           "if": { "properties": { "type": { "const": "container" } }, "required": ["type"] },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["origin"] },
+                { "required": ["flipX"] },
+                { "required": ["flipY"] },
+                { "required": ["tint"] },
+                { "required": ["tintMode"] },
+                { "required": ["width"] },
+                { "required": ["height"] }
+              ]
+            }
+          },
           "else": { "not": { "required": ["children"] } }
         },
         {
-          "if": { "properties": { "type": { "const": "image" } }, "required": ["type"] },
-          "then": { "$ref": "#/$defs/visualImage" }
-        },
-        {
-          "if": { "properties": { "type": { "const": "sprite" } }, "required": ["type"] },
+          "if": { "properties": { "type": { "enum": ["image", "sprite"] } }, "required": ["type"] },
           "then": { "$ref": "#/$defs/visualImage" }
         },
         {
           "if": { "properties": { "type": { "const": "text" } }, "required": ["type"] },
-          "then": { "$ref": "#/$defs/text" }
-        },
-        {
-          "if": { "properties": { "type": { "const": "graphics" } }, "required": ["type"] },
-          "then": { "$ref": "#/$defs/graphics" }
+          "then": {
+            "allOf": [
+              { "$ref": "#/$defs/text" },
+              { "not": { "anyOf": [{ "required": ["flipX"] }, { "required": ["flipY"] }] } }
+            ]
+          }
         }
       ]
     },
@@ -138,15 +183,8 @@
             { "type": "integer", "minimum": 0 },
             { "type": "string", "minLength": 1 }
           ],
-          "description": "Frame index or name within the texture."
-        },
-        "origin": { "$ref": "#/$defs/point" },
-        "scale": { "$ref": "#/$defs/point" },
-        "rotation": {
-          "type": "number",
-          "description": "Radians, matching Phaser's rotation property (proposed convention)."
-        },
-        "tint": { "$ref": "#/$defs/color" }
+          "description": "Frame index or name within the texture. Defaults to the texture's default frame. Phaser silently falls back to the default frame when it is missing, so loaders must validate it."
+        }
       },
       "additionalProperties": true
     },
@@ -158,20 +196,8 @@
         "text": { "type": "string" },
         "style": {
           "type": "object",
-          "description": "Text style. Open: maps to Phaser's text style object.",
+          "description": "Passed to Phaser's text style unchanged. Phaser defaults: Courier, 16px, white.",
           "additionalProperties": true
-        }
-      },
-      "additionalProperties": true
-    },
-
-    "graphics": {
-      "type": "object",
-      "properties": {
-        "commands": {
-          "type": "array",
-          "items": { "type": "object", "additionalProperties": true },
-          "description": "Provisional: drawing commands. Open question in README.md."
         }
       },
       "additionalProperties": true
