@@ -111,9 +111,9 @@ Fields not listed for a type are invalid on that type. In particular, **containe
 | `flipX`, `flipY` | boolean | `false` | Image and sprite only. |
 | `tint` | `#rrggbb` | `#ffffff` | Converted to Phaser's numeric tint. |
 | `tintMode` | enum | `multiply` | One of `multiply`, `fill`, `add`, `screen`, `overlay`, `hard-light`. |
-| `blendMode` | enum | `normal` | One of `normal`, `add`, `multiply`, `screen`. These are the modes WebGL renders natively. Other Phaser blend modes may render incorrectly in WebGL (`difference` was observed falling back to `normal`), so they are not in the core. Phaser silently treats an unknown name as `normal`, so loaders must reject unknown values themselves. |
+| `blendMode` | enum | `normal` for image, sprite and text; none for container | One of `normal`, `add`, `multiply`, `screen`. A container has no blend mode of its own by default (Phaser uses an internal "skip check" value), so its children keep their own. Writing `blendMode` on a container sets one explicitly. These are the modes WebGL renders natively. Other Phaser blend modes may render incorrectly in WebGL (`difference` was observed falling back to `normal`), so they are not in the core. Phaser silently treats an unknown name as `normal`, so loaders must reject unknown values themselves. |
 | `text` | string | required | |
-| `style` | object | Phaser's defaults | Passed to Phaser's text style unchanged. Phaser's defaults are Courier, 16px, white. A numeric `fontSize` is accepted and becomes pixels. |
+| `style` | object | Phaser's defaults | Phaser's text style *config* object, passed through unchanged (so shadow is nested as `shadow: { offsetX, ... }` and word wrap as `wordWrap: { width, useAdvancedWrap }`). Phaser's defaults are Courier, 16px, white. A numeric `fontSize` is accepted and becomes pixels. `padding` goes inside `style`. If `metrics` (`ascent`, `descent`, `fontSize`) is given, Phaser uses it instead of measuring, which changes the text height, so it must be preserved. |
 
 `graphics` is reserved in v0.1: the type name and common fields are valid, any other fields are preserved but not defined. Drawing commands will be specified in a later minor version.
 

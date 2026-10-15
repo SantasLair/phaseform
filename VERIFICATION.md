@@ -27,6 +27,14 @@ Run on 2026-10-15: Phaser **4.2.1**, WebGL renderer (SwiftShader), Chrome 155. R
 | 9 | Container `scrollFactor` | `setScrollFactor(0.5)` changes the container only. The documented third argument did **not** propagate to the child in 4.2.1. | Container `scrollFactor` applies to the container only. | confirmed (docs and behavior disagree on the third argument) |
 | 10 | Scene size | Default camera size equals the game size (800×600). Mixed scene sizes in one game were not tested. | `size` is the game size. | partly confirmed |
 
+## Found by the example round-trip (see ROUNDTRIP.md)
+
+| # | Unknown | Result | Spec consequence | Status |
+|---|---|---|---|---|
+| 11 | Default `blendMode` of a container | A container's `blendMode` is -1 (`SKIP_CHECK`), not 0 (normal). Image, sprite and text default to 0, and a child added to a container stays 0. | `blendMode` default is `normal` for image, sprite and text, and none for container. | confirmed |
+| 12 | `style.metrics` | Phaser measures text metrics itself unless the style config supplies them. For Arial 48px it measured ascent 43, descent 10, fontSize 53, while the example supplied 45, 10, 55, giving text heights 53 vs 55. Fixed in the serializer; `text metrics` is now pixel-exact. | `metrics` must be preserved in `style`. | confirmed |
+| 13 | Shared children in non-exclusive containers | The same object can be in the `list` of two containers at once while `parentContainer` points at only one. A tree cannot represent that, so the document duplicates it per container. `non exclusive containers` round-trips **intermittently**: 155, 0, then 116 differing pixels across three runs. Cause unknown; sharing is one unproven hypothesis. | Documents duplicate shared children; loaders cannot recover the sharing. | observed; intermittent diff unexplained |
+
 ## Follow-ups
 - **Item 2:** retest OVERLAY and ERASE with colors that make them distinguishable from NORMAL. Decide whether non-native modes are simply unsupported in core.
 - **Item 5:** test tint on graphics.

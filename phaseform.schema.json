@@ -76,7 +76,7 @@
 
     "blendMode": {
       "enum": ["normal", "add", "multiply", "screen"],
-      "description": "The blend modes WebGL renders natively. Default normal. Phaser silently treats unknown names as normal, so loaders must reject unknown values."
+      "description": "The blend modes WebGL renders natively. Default normal for image, sprite and text; a container has none by default (its children keep their own). Phaser silently treats unknown names as normal, so loaders must reject unknown values."
     },
 
     "object": {
@@ -196,7 +196,7 @@
         "text": { "type": "string" },
         "style": {
           "type": "object",
-          "description": "Passed to Phaser's text style unchanged. Phaser defaults: Courier, 16px, white.",
+          "description": "Phaser text style config, passed through unchanged (nested shadow and wordWrap objects, padding inside). Phaser defaults: Courier, 16px, white. metrics, if present, must be preserved because it changes text height.",
           "additionalProperties": true
         }
       },
