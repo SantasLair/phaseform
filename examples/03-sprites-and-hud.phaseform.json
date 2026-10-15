@@ -1,0 +1,74 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Level1",
+  "size": { "width": 800, "height": 600 },
+  "background": "#87ceeb",
+  "objects": [
+    {
+      "id": "ground",
+      "type": "image",
+      "key": "ground-tile",
+      "x": 0,
+      "y": 560,
+      "depth": 1,
+      "origin": { "x": 0, "y": 0 },
+      "scale": { "x": 25, "y": 1 }
+    },
+    {
+      "id": "coin-1",
+      "type": "sprite",
+      "key": "coin",
+      "frame": 0,
+      "x": 200,
+      "y": 420,
+      "depth": 5
+    },
+    {
+      "id": "coin-2",
+      "type": "sprite",
+      "key": "coin",
+      "frame": 0,
+      "x": 420,
+      "y": 340,
+      "depth": 5
+    },
+    {
+      "id": "player",
+      "type": "sprite",
+      "key": "hero",
+      "frame": "idle-0",
+      "x": 120,
+      "y": 540,
+      "depth": 10,
+      "origin": { "x": 0.5, "y": 1 },
+      "scripts": ["scripts/player.js"]
+    },
+    {
+      "id": "hud",
+      "type": "container",
+      "x": 0,
+      "y": 0,
+      "depth": 100,
+      "children": [
+        {
+          "id": "hud-bg",
+          "type": "image",
+          "key": "panel",
+          "x": 8,
+          "y": 8,
+          "alpha": 0.6,
+          "origin": { "x": 0, "y": 0 }
+        },
+        {
+          "id": "score",
+          "type": "text",
+          "text": "Score: 0",
+          "x": 20,
+          "y": 16,
+          "style": { "fontFamily": "Arial", "fontSize": "20px", "color": "#ffffff" }
+        }
+      ]
+    }
+  ]
+}

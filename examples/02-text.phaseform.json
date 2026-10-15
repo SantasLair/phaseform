@@ -1,0 +1,33 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Title",
+  "size": { "width": 800, "height": 600 },
+  "background": "#1e2a3a",
+  "objects": [
+    {
+      "id": "title",
+      "type": "text",
+      "text": "PHASEFORM",
+      "x": 400,
+      "y": 260,
+      "style": {
+        "fontFamily": "Arial",
+        "fontSize": "64px",
+        "color": "#ffffff"
+      }
+    },
+    {
+      "id": "subtitle",
+      "type": "text",
+      "text": "A scene format for Phaser",
+      "x": 400,
+      "y": 340,
+      "style": {
+        "fontFamily": "Arial",
+        "fontSize": "24px",
+        "color": "#9fb3c8"
+      }
+    }
+  ]
+}

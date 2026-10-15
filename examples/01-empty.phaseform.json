@@ -1,0 +1,8 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Empty",
+  "size": { "width": 800, "height": 600 },
+  "background": "#000000",
+  "objects": []
+}

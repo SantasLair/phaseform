@@ -1,0 +1,43 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Physics",
+  "size": { "width": 800, "height": 600 },
+  "background": "#0d0d0d",
+  "objects": [
+    {
+      "id": "floor",
+      "type": "image",
+      "key": "block",
+      "x": 400,
+      "y": 580,
+      "scale": { "x": 20, "y": 1 },
+      "extensions": {
+        "arcade": { "body": "static" }
+      }
+    },
+    {
+      "id": "crate",
+      "type": "sprite",
+      "key": "crate",
+      "x": 400,
+      "y": 300,
+      "tint": "#ffcc66",
+      "extensions": {
+        "arcade": { "body": "dynamic", "bounce": 0.2 },
+        "editor-hints": { "lockedInEditor": true }
+      }
+    },
+    {
+      "id": "future-thing",
+      "type": "hologram",
+      "key": "projector",
+      "x": 600,
+      "y": 200,
+      "customProperty": "loaders that don't know this type must keep it on save"
+    }
+  ],
+  "extensions": {
+    "arcade": { "gravity": { "x": 0, "y": 600 } }
+  }
+}

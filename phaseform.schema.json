@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phaseform.dev/schema/0.1.0/phaseform.schema.json",
+  "title": "PHASEFORM scene",
+  "description": "A PHASEFORM v0.1 scene document. Structure only: behavior (draw order, coordinate conventions, id uniqueness, asset resolution) is defined in README.md and must be enforced by the loader.",
+  "type": "object",
+  "required": ["format", "version", "key", "size", "objects"],
+  "properties": {
+    "format": {
+      "const": "phaseform"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$",
+      "description": "Spec version the file was written against (semver)."
+    },
+    "key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Scene key, matching the key used with Phaser's scene manager."
+    },
+    "size": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "background": {
+      "type": "string",
+      "description": "Background color as a CSS color string."
+    },
+    "objects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/object" },
+      "description": "Ordered list of objects. Later objects draw on top of earlier ones at equal depth."
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": true,
+
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "Extension data keyed by lowercase extension name. Loaders must preserve extensions they do not understand."
+    },
+
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+
+    "color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "description": "Tint color as #rrggbb. Provisional: the spec does not yet fix the tint representation."
+    },
+
+    "object": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the scene. Uniqueness is not expressible in JSON Schema and must be checked by the loader."
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Object type. Open registry: unknown types are valid and must be preserved."
+        },
+        "x": { "type": "number", "default": 0 },
+        "y": { "type": "number", "default": 0 },
+        "depth": { "type": "number", "default": 0 },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1, "default": 1 },
+        "visible": { "type": "boolean", "default": true },
+        "scripts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Script paths to attach."
+        },
+        "extensions": { "$ref": "#/$defs/extensions" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/object" },
+          "description": "Child objects. Valid only for type container."
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "container" } }, "required": ["type"] },
+          "else": { "not": { "required": ["children"] } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "image" } }, "required": ["type"] },
+          "then": { "$ref": "#/$defs/visualImage" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "sprite" } }, "required": ["type"] },
+          "then": { "$ref": "#/$defs/visualImage" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "text" } }, "required": ["type"] },
+          "then": { "$ref": "#/$defs/text" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "graphics" } }, "required": ["type"] },
+          "then": { "$ref": "#/$defs/graphics" }
+        }
+      ]
+    },
+
+    "visualImage": {
+      "type": "object",
+      "required": ["key"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texture key the scene expects to be loaded. PHASEFORM does not define how it is loaded."
+        },
+        "frame": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "minLength": 1 }
+          ],
+          "description": "Frame index or name within the texture."
+        },
+        "origin": { "$ref": "#/$defs/point" },
+        "scale": { "$ref": "#/$defs/point" },
+        "rotation": {
+          "type": "number",
+          "description": "Radians, matching Phaser's rotation property (proposed convention)."
+        },
+        "tint": { "$ref": "#/$defs/color" }
+      },
+      "additionalProperties": true
+    },
+
+    "text": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string" },
+        "style": {
+          "type": "object",
+          "description": "Text style. Open: maps to Phaser's text style object.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "graphics": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": { "type": "object", "additionalProperties": true },
+          "description": "Provisional: drawing commands. Open question in README.md."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
