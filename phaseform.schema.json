@@ -141,7 +141,7 @@
         "blendMode": { "$ref": "#/$defs/blendMode" },
         "fill": { "$ref": "#/$defs/fill" },
         "stroke": { "$ref": "#/$defs/stroke" },
-        "dropShadow": { "$ref": "#/$defs/dropShadow" }
+            "dropShadow": { "$ref": "#/$defs/dropShadow" }
       },
       "additionalProperties": true,
       "allOf": [
@@ -163,8 +163,17 @@
           "else": { "not": { "required": ["children"] } }
         },
         {
-          "if": { "properties": { "type": { "enum": ["image", "sprite"] } }, "required": ["type"] },
+          "if": { "properties": { "type": { "enum": ["image", "sprite", "tileSprite"] } }, "required": ["type"] },
           "then": { "$ref": "#/$defs/visualImage" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "tileSprite" } }, "required": ["type"] },
+          "then": {
+            "allOf": [
+              { "$ref": "#/$defs/tileSprite" },
+              { "not": { "required": ["children"] } }
+            ]
+          }
         },
         {
           "if": { "properties": { "type": { "enum": ["rectangle", "ellipse", "triangle", "line", "polygon", "star", "arc"] } }, "required": ["type"] },
@@ -220,6 +229,18 @@
       },
       "additionalProperties": true,
       "description": "Shape outline. Absent means not stroked. Valid on shapes only."
+    },
+
+    "tileSprite": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "minimum": 1, "description": "Size of the tiled area in pixels. Phaser rounds it down to a whole number." },
+        "height": { "type": "number", "minimum": 1 },
+        "tilePosition": { "$ref": "#/$defs/vec2", "description": "Scroll offset of the tiling texture inside the area. Default {0, 0}." },
+        "tileScale": { "$ref": "#/$defs/vec2", "description": "Scale of the tiling texture inside the area. Default {1, 1}." },
+        "tileRotation": { "type": "number", "default": 0, "description": "Rotation of the tiling texture in radians." }
+      }
     },
 
     "dropShadow": {

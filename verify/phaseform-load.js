@@ -25,11 +25,17 @@ window.PhaseformLoader = (function () {
       let o;
       switch (d.type) {
         case 'image':
-        case 'sprite': {
+        case 'sprite':
+        case 'tileSprite': {
           const tex = scene.textures.exists(d.key) ? scene.textures.get(d.key) : null;
           if (!tex) { warnings.push(`${d.id}: texture "${d.key}" not loaded`); }
           else if (d.frame !== undefined && !tex.has(d.frame)) throw new Error(`${d.id}: texture "${d.key}" has no frame ${JSON.stringify(d.frame)}`);
-          o = d.type === 'image' ? scene.add.image(x, y, d.key, d.frame) : scene.add.sprite(x, y, d.key, d.frame);
+          if (d.type === 'tileSprite') {
+            o = scene.add.tileSprite(x, y, d.width, d.height, d.key, d.frame);
+            if (d.tilePosition) o.setTilePosition(d.tilePosition.x, d.tilePosition.y);
+            if (d.tileScale) o.setTileScale(d.tileScale.x, d.tileScale.y);
+            if (d.tileRotation) o.setTileRotation(d.tileRotation);
+          } else o = d.type === 'image' ? scene.add.image(x, y, d.key, d.frame) : scene.add.sprite(x, y, d.key, d.frame);
           break;
         }
         case 'text':

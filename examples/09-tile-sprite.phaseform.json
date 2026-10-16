@@ -1,0 +1,56 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "TileSprite",
+  "size": {
+    "width": 800,
+    "height": 600
+  },
+  "background": "#0d0d0d",
+  "objects": [
+    {
+      "id": "sky",
+      "type": "tileSprite",
+      "key": "sky",
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 600,
+      "origin": {
+        "x": 0,
+        "y": 0
+      },
+      "tilePosition": {
+        "x": 120,
+        "y": 0
+      }
+    },
+    {
+      "id": "ground",
+      "type": "tileSprite",
+      "key": "ground-tile",
+      "x": 400,
+      "y": 560,
+      "width": 800,
+      "height": 64,
+      "tileScale": {
+        "x": 2,
+        "y": 2
+      },
+      "depth": 1
+    },
+    {
+      "id": "pattern",
+      "type": "tileSprite",
+      "key": "panel",
+      "frame": 0,
+      "x": 400,
+      "y": 300,
+      "width": 200,
+      "height": 200,
+      "tileRotation": 0.5,
+      "tint": "#88ccff",
+      "depth": 2
+    }
+  ]
+}

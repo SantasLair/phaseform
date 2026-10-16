@@ -3,7 +3,7 @@
 // report.lossy / report.unsupported instead of being dropped silently.
 window.PhaseformSerializer = (function () {
   const BLEND = { 0: 'normal', 1: 'add', 2: 'multiply', 3: 'screen' };
-  const TYPES = { Image: 'image', Sprite: 'sprite', Text: 'text', Container: 'container', Graphics: 'graphics', BitmapText: 'bitmapText',
+  const TYPES = { Image: 'image', Sprite: 'sprite', Text: 'text', Container: 'container', Graphics: 'graphics', BitmapText: 'bitmapText', TileSprite: 'tileSprite',
     Rectangle: 'rectangle', Ellipse: 'ellipse', Triangle: 'triangle', Line: 'line', Polygon: 'polygon', Star: 'star', Arc: 'arc' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
   const SHADOW = { shadowOffsetX: 'offsetX', shadowOffsetY: 'offsetY', shadowColor: 'color', shadowBlur: 'blur', shadowStroke: 'stroke', shadowFill: 'fill' };
@@ -122,9 +122,15 @@ window.PhaseformSerializer = (function () {
         else report.lossy.push({ id, field: 'blendMode', why: 'mode ' + o.blendMode + ' not in spec' });
       }
 
-      if (type === 'image' || type === 'sprite') {
+      if (type === 'image' || type === 'sprite' || type === 'tileSprite') {
         out.key = o.texture.key;
         if (o.frame.name !== o.texture.firstFrame) out.frame = o.frame.name;
+        if (type === 'tileSprite') {
+          out.width = o.width; out.height = o.height;
+          if (o.tilePositionX || o.tilePositionY) out.tilePosition = { x: o.tilePositionX, y: o.tilePositionY };
+          if (o.tileScaleX !== 1 || o.tileScaleY !== 1) out.tileScale = { x: o.tileScaleX, y: o.tileScaleY };
+          if (o.tileRotation) out.tileRotation = o.tileRotation;
+        }
       } else if (type === 'text') {
         out.text = o.text;
         const style = textStyle(o, id);

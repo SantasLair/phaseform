@@ -56,7 +56,7 @@ export function checkProject(projectPath) {
         else if (entry.assets && !entry.assets.includes(o.font)) warnings.push(`scene "${entry.key}": object "${o.id}" uses font "${o.font}" not in the scene's asset list`);
         continue;
       }
-      if (o.type !== 'image' && o.type !== 'sprite') continue;
+      if (o.type !== 'image' && o.type !== 'sprite' && o.type !== 'tileSprite') continue;
       const tex = textures.get(o.key);
       if (!tex || !IMAGE_REF_TYPES.has(tex.type)) { warnings.push(`scene "${entry.key}": object "${o.id}" uses texture "${o.key}" not in the manifest`); continue; }
       if (entry.assets && !entry.assets.includes(o.key)) {

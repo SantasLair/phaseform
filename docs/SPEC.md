@@ -9,6 +9,7 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Scope](#scope)
 - [Scene document](#scene-document)
 - [Objects](#objects)
+- [Tile sprite](#tile-sprite)
 - [Bitmap text](#bitmap-text)
 - [Shapes](#shapes)
 - [Scripts and code-driven objects](#scripts-and-code-driven-objects)
@@ -99,6 +100,7 @@ On a container, `scrollFactor` affects the container only, not its children.
 | `text` | `Text` | `text`, `style`, `origin`, `scale`, `rotation`, `tint`, `tintMode`, `blendMode` |
 | `container` | `Container` | `children`, `scale`, `rotation`, `blendMode` |
 | `rectangle`, `ellipse`, `triangle`, `line`, `polygon`, `star`, `arc` | the Phaser shape of the same name | [shapes](#shapes) |
+| `tileSprite` | `TileSprite` | `key`, `frame`, `width`, `height`, `tilePosition`, `tileScale`, `tileRotation`, `origin`, `scale`, `rotation`, `flipX`, `flipY`, `tint`, `tintMode`, `blendMode` |
 | `bitmapText` | `BitmapText` | [bitmap text](#bitmap-text) |
 | `graphics` | `Graphics` | none. Code-driven, see [Scripts](#scripts-and-code-driven-objects) |
 
@@ -121,6 +123,10 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 | `blendMode` | enum | `normal`; none for container | image, sprite, text, container |
 | `text` | string, required | | text |
 | `style` | object | Phaser's text defaults | text |
+| `width`, `height` | number, required | | tileSprite |
+| `tilePosition` | vec2 | `{0, 0}` | tileSprite |
+| `tileScale` | vec2 | `{1, 1}` | tileSprite |
+| `tileRotation` | number, radians | `0` | tileSprite |
 | `children` | list of objects | | container |
 
 `tintMode` is one of `multiply`, `fill`, `add`, `screen`, `overlay`, `hard-light`. `blendMode` is one of `normal`, `add`, `multiply`, `screen`.
@@ -133,6 +139,10 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 - **`blendMode`.** The four values are the modes WebGL renders natively. Other Phaser modes may render incorrectly in WebGL (`difference` was observed falling back to `normal`), so they are not in the core. Phaser silently treats an unknown name as `normal`, so loaders must reject unknown values themselves. A container has no blend mode of its own by default, so its children keep theirs. Writing `blendMode` on a container sets one explicitly.
 - **`style`.** Phaser's text style config object, passed through unchanged: shadow is nested as `shadow: { offsetX, ... }`, word wrap as `wordWrap: { width, useAdvancedWrap }`, and `padding` goes inside `style`. Phaser's defaults are Courier, 16px, white. A numeric `fontSize` becomes pixels. If `metrics` (`ascent`, `descent`, `fontSize`) is given, Phaser uses it instead of measuring, which changes text height, so it must be preserved.
 - **vec2.** `{ "x": number, "y": number }`.
+
+### Tile sprite
+
+`tileSprite` repeats a texture across a `width` by `height` area. It has the fields of `image` (`key`, `frame`, `origin`, `scale`, `rotation`, `flipX`, `flipY`, `tint`, `tintMode`, `blendMode`) plus `width` and `height`, which are required, and the texture's offset `tilePosition`, `tileScale` and `tileRotation`. Phaser rounds the size down to a whole number, and treats a size of 0 as "use the frame size", so documents always carry the real size. Moving `tilePosition` scrolls the texture without moving the object, which is how scrolling backgrounds are made.
 
 ### Bitmap text
 
