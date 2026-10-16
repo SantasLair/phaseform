@@ -1,0 +1,86 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform filters probe</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Probes Phaser 4 filter controllers and mask behavior for docs/VERIFICATION.md. Results land in window.__results.
+window.__results = null;
+const SKIP = new Set(['camera', 'renderNode', 'paddingOverride', 'currentPadding', 'ignoreDestroy', 'glTexture', '_dynamicTexture', 'needsUpdate']);
+function dump(c) {
+  const out = {};
+  for (const k of Object.keys(c)) {
+    if (SKIP.has(k)) continue;
+    const v = c[k];
+    if (v === null || ['number', 'string', 'boolean'].includes(typeof v)) out[k] = v;
+    else if (Array.isArray(v) || ArrayBuffer.isView(v)) out[k] = Array.from(v).slice(0, 24);
+    else if (typeof v === 'object') out[k] = v.constructor ? `[${v.constructor.name}${v.key !== undefined ? ' ' + v.key : ''}]` : '[object]';
+    else out[k] = `[${typeof v}]`;
+  }
+  return out;
+}
+class Probe extends Phaser.Scene {
+  constructor() { super('Probe'); }
+  create() {
+    const r = { defaults: {}, errors: {} };
+    const g = this.add.graphics();
+    g.fillStyle(0xffffff).fillRect(0, 0, 8, 8);
+    g.generateTexture('tex8', 8, 8);
+    g.destroy();
+    const host = this.add.image(-100, -100, 'tex8');
+    host.enableFilters();
+    const fl = host.filters.internal;
+    const calls = {
+      barrel: () => fl.addBarrel(), blend: () => fl.addBlend('tex8'), blocky: () => fl.addBlocky(), blur: () => fl.addBlur(),
+      bokeh: () => fl.addBokeh(), colorMatrix: () => fl.addColorMatrix(), combineColorMatrix: () => fl.addCombineColorMatrix('tex8'),
+      displacement: () => fl.addDisplacement('tex8'), glow: () => fl.addGlow(), gradientMap: () => fl.addGradientMap(),
+      imageLight: () => fl.addImageLight(), key: () => fl.addKey(), mask: () => fl.addMask('tex8'), normalTools: () => fl.addNormalTools(),
+      panoramaBlur: () => fl.addPanoramaBlur(), pixelate: () => fl.addPixelate(), quantize: () => fl.addQuantize(),
+      shadow: () => fl.addShadow(), threshold: () => fl.addThreshold(), tiltShift: () => fl.addTiltShift(), vignette: () => fl.addVignette(), wipe: () => fl.addWipe()
+    };
+    for (const [k, f] of Object.entries(calls)) {
+      try { const c = f(); r.defaults[k] = { ctor: c.constructor.name, props: dump(c) }; } catch (e) { r.errors[k] = String(e); }
+    }
+    try { const cm = fl.addColorMatrix(); r.colorMatrix = { colorMatrixKeys: Object.keys(cm.colorMatrix || {}), matrix: cm.colorMatrix && Array.from(cm.colorMatrix.getData ? cm.colorMatrix.getData() : cm.colorMatrix._matrix || []) }; } catch (e) { r.colorMatrix = String(e); }
+    try { r.filtersShape = { keys: Object.keys(host.filters), internalKeys: Object.keys(fl), listLen: fl.list.length }; } catch (e) { r.filtersShape = String(e); }
+
+    // Mask source drawn? A green rect at x 0..100 is the mask for a red image at x 50..150 (y 0..100).
+    const red = this.add.rectangle(50, 0, 100, 100, 0xff0000).setOrigin(0);
+    const maskSrc = this.add.rectangle(0, 0, 100, 100, 0x00ff00).setOrigin(0);
+    red.enableFilters();
+    red.filters.internal.addMask(maskSrc);
+    // Same, but the source is never added to the display list.
+    const red2 = this.add.rectangle(50, 150, 100, 100, 0xff0000).setOrigin(0);
+    const offList = new Phaser.GameObjects.Rectangle(this, 0, 150, 100, 100, 0x00ff00).setOrigin(0);
+    red2.enableFilters();
+    red2.filters.internal.addMask(offList);
+    // Filter on a container: does it apply to children? Blue child inside a pixelated/threshold container.
+    const cont = this.add.container(250, 0);
+    cont.add(this.add.rectangle(0, 0, 100, 100, 0x0000ff).setOrigin(0));
+    cont.enableFilters();
+    cont.filters.internal.addMask(new Phaser.GameObjects.Rectangle(this, 0, 0, 50, 100, 0xffffff).setOrigin(0), false, undefined, 'local');
+    // Inverted mask
+    const red3 = this.add.rectangle(250, 150, 100, 100, 0xff0000).setOrigin(0);
+    red3.enableFilters();
+    red3.filters.internal.addMask(new Phaser.GameObjects.Rectangle(this, 250, 150, 50, 100, 0xffffff).setOrigin(0), true);
+    r.listSizes = { displayList: this.children.list.length };
+
+    const probes = {
+      sourceOnlyArea: [25, 50], overlapArea: [75, 50], imageOnlyArea: [125, 50],
+      offListSourceArea: [25, 200], offListOverlap: [75, 200], offListImageOnly: [125, 200],
+      containerMaskedIn: [275, 50], containerMaskedOut: [325, 50],
+      invertLeft: [275, 200], invertRight: [325, 200]
+    };
+    r.pixels = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (c) => { r.pixels[k] = [c.red, c.green, c.blue]; this.time.delayedCall(50, next); });
+      };
+      next();
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Probe, banner: false, audio: { noAudio: true } });
+</script>

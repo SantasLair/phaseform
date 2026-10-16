@@ -44,11 +44,29 @@ Run on 2026-10-15: Phaser **4.2.1**, WebGL renderer (SwiftShader), Chrome 155. R
 | 21 | Animation frame index | `AnimationFrame.index` is 1-based (`Animation.getFrames` starts at 1), while `play({ startFrame })` takes a 0-based index into `frames`. Serializing `startFrame` as `currentFrame.index - 1` rebuilt `container/animation test` and `container/container input test` pixel-exact with `startFrame: 11`, after every animation was removed and recreated from its definition. | `startFrame` is 0-based. | confirmed |
 | 22 | Text `lineSpacing` | `Text` keeps `lineSpacing` as an object property, absent from `style.toJSON()`, and the constructor applies `style.lineSpacing` from the config (`Text.js`, 4.2.1). Writing it into `style` rebuilt `text/line spacing` and `group/sprite pool` pixel-exact. | Line spacing is `style.lineSpacing`. | confirmed |
 
+## Filters and masks (probes: `verify/filters*-harness.html`, run with `node filters-probe.mjs <page>`)
+
+| # | Unknown | Result | Spec consequence | Status |
+|---|---|---|---|---|
+| 23 | Mask API in Phaser 4 | A mask is a filter: `FilterList#addMask(mask, invert, viewCamera, viewTransform, scaleFactor)`, where `mask` is a texture key or a game object. Objects get `filters.internal` and `filters.external` after `enableFilters()` (null before). `FilterList` has 23 `add...` methods (4.2.1). | One `filters` field covers filters and masks, with `internal` and `external` lists. | confirmed |
+| 24 | Filter defaults | Read from each controller after `add...()` with no arguments (probe 1) and from the 4.2.1 constructors. `addImageLight()` with no config throws; the loader passes `{}`. Glow `quality` and `distance` default to the game config's `glowQuality` and `glowDistance`. | The defaults in the filter table. | confirmed |
+| 25 | Is a mask source drawn? | A visible source on the display list draws normally as well as masking (green showed where only the source was). A source with `visible: false` still masks and is not drawn. A source never added to the display list masks and is not drawn. A source with `alpha: 0` masks everything out. | Phaser's default is kept: hide a mask-only source with `visible: false`. | confirmed |
+| 26 | Masks with containers and sharing | With the default `viewTransform: "world"`, a source inside a container (at 220, 80) masked at its world position. A mask on a container clipped its children. One source masked two objects. A mask on the `external` list worked. `viewTransform: "local"` ignored the source's parent and placed it at its own coordinates. | Container, sharing and `viewTransform` rules in Masks. | confirmed |
+| 27 | Filter area per object type | An inverted `threshold` on the `internal` list turned a far corner of the view white for container, graphics and all seven shapes, and left it black for image, sprite, tileSprite and text (probe 5). Phaser documents that objects without well-defined bounds get `filtersFocusContext`. | The Filter area note. | confirmed |
+| 28 | Texture masks | An external texture mask stretched a half-white texture over the 400-wide view (visible to x 200). On a rectangle (no well-defined bounds) the internal mask also used the view, so the whole 100-wide rectangle showed. | Prefer `source`; texture masks follow the filter area. | confirmed |
+| 29 | Blend filter modes | `FilterBlend` builds its shader from `#define BLEND <name>` and defines a function for all 28 `BlendModes` (NORMAL to XOR). `multiply` of red over #3366cc gave (51, 0, 0) inside an image and nothing outside. `difference` of two opaque inputs gave a transparent result, because the shader applies the mode to alpha too. | `blend.blendMode` accepts every mode; alpha note. | confirmed |
+| 30 | Wipe direction | The constructor docs say direction 0 is "left to right, or top to bottom", but `setTopToBottom()` sets direction 1, axis 1, and the class docs list the same. The spec follows the methods. Rendering of the four directions was not pixel-tested. | `wipe.direction` names map like the `set...` methods. | source read; not pixel-tested |
+| 31 | Loader and serializer round trip | `npm run test:filters` (13 checks): the filters example (all 23 types) loads with no warnings, serializes with nothing lossy, every field survives, and serialize, load, serialize is stable. Pixel checks: hidden mask source, container mask, invert, `active: false`, blend `multiply`. Filter textures are found by searching the texture manager, because controllers keep only the GL texture. | Field mapping in the filter table. | confirmed |
+| 32 | Many filters on one object | One off-screen object holding all 22 filter types at once left grey pixels across the whole view in probe 3, and the other objects rendered wrongly. With those filters removed, the same page rendered correctly. Not investigated. | None yet. | observed; cause unknown |
+
 ## Follow-ups
 - **Item 2:** retest OVERLAY and ERASE with colors that make them distinguishable from NORMAL. Decide whether non-native modes are simply unsupported in core.
 - **Item 5:** test tint on graphics.
 - **Item 10:** test two scenes with different `size` in one game.
 - **Item 16:** work out which end of a `setLineWidth(start, end)` line is thick, and whether the docs or the renderer is right.
+- **Item 30:** pixel-test the four wipe directions.
+- **Item 32:** find out why many filters on one object disturb the whole view.
+- Filters not pixel-tested: `imageLight`, `normalTools`, `panoramaBlur`, `gradientMap`, `quantize`, `key`, `displacement`, `combineColorMatrix`, `parallel`. They load and round-trip (item 31) but their output was not checked.
 - Unresolved edge: whether `setTintFill` is deprecated or kept; check the changelog if the spec ever needs to mention it.
 
 ## Add new items here

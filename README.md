@@ -38,13 +38,13 @@ Scenes refer to assets by key. A separate project file lists the scenes and maps
 
 - **Data only.** No code in the file. Behavior is referenced by script path.
 - **Maps directly to Phaser.** Each object is a Phaser game object type, with no invented concepts.
-- **Small core, open extensions.** Images, sprites, text and containers are core. Anything else goes in namespaced extensions.
+- **Small core, open extensions.** Images, sprites, text, containers, shapes, and Phaser 4 filters and masks are core. Anything else goes in namespaced extensions.
 - **Nothing is silently lost.** Tools preserve types and fields they do not understand.
 - **Human-readable.** Plain JSON that diffs well in version control.
 
 ## How well does it work?
 
-Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 259 official Phaser examples were converted to PHASEFORM and rebuilt: of the 143 that use only core types, 136 rebuild pixel-for-pixel. The rest need object types the core does not have yet, such as dynamic bitmap text, or draw from code (graphics). Details are in the [round-trip results](docs/ROUNDTRIP.md).
+Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 259 official Phaser examples were converted to PHASEFORM and rebuilt: of the 143 that use only core types, 138 rebuild pixel-for-pixel. The rest need object types the core does not have yet, such as dynamic bitmap text, or draw from code (graphics). Details are in the [round-trip results](docs/ROUNDTRIP.md).
 
 ## Documentation
 

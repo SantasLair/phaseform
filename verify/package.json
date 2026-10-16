@@ -5,7 +5,8 @@
   "scripts": {
     "verify": "node run.mjs",
     "validate": "node validate.mjs",
-    "test:scripts": "node scripts-test.mjs"
+    "test:scripts": "node scripts-test.mjs",
+    "test:filters": "node filters-test.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1",

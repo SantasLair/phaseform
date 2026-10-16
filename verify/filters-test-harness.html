@@ -1,0 +1,83 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform filters check</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script src="phaseform-load.js"></script>
+<script src="phaseform-serialize.js"></script>
+<script>
+// Checks docs/SPEC.md "Filters and masks" against Phaser 4 through the reference loader and serializer.
+// The example scene arrives as window.__example. Results land in window.__results.
+window.__results = null;
+
+class Check extends Phaser.Scene {
+  constructor() { super('Check'); }
+  preload() {
+    const make = (key, w, h, fill) => { const c = this.textures.createCanvas(key, w, h); c.context.fillStyle = fill; c.context.fillRect(0, 0, w, h); c.refresh(); };
+    make('sky', 256, 128, '#3366cc'); make('heart', 32, 32, '#ff3366'); make('panel', 200, 80, '#445566'); make('red', 100, 60, '#ff0000');
+  }
+  create() {
+    const r = {};
+    const catchMsg = (f) => { try { f(); return null; } catch (e) { return String(e.message || e); } };
+
+    // 1. the full example loads; then serialize, reload the result and serialize again
+    const ex = window.__example;
+    const built = PhaseformLoader.build(this, ex);
+    r.exampleWarnings = built.warnings;
+    const first = PhaseformSerializer.serialize(this);
+    r.firstLossy = first.report.lossy;
+    const byName = {};
+    const walk = (list) => { for (const o of list) { byName[o.id] = o; if (o.children) walk(o.children); } };
+    // the serializer generates ids, so match objects by document order instead
+    const flat = (list, out = []) => { for (const o of list) { out.push(o); if (o.children) flat(o.children, out); } return out; };
+    const src = flat(ex.objects), ser = flat(first.doc.objects);
+    r.sameObjectCount = src.length === ser.length;
+    const idMap = {}; src.forEach((o, i) => { if (ser[i]) idMap[ser[i].id] = o.id; });
+    // rename references in the serialized filters back to the example's ids so the two can be compared
+    const rename = (v) => JSON.parse(JSON.stringify(v || null), (k, x) => (['source', 'rotationSource', 'modelRotationSource'].includes(k) && idMap[x]) ? idMap[x] : x);
+    r.filterPairs = src.map((o, i) => ({ id: o.id, input: o.filters || null, output: rename(ser[i] && ser[i].filters) })).filter(p => p.input || p.output);
+    PhaseformLoader.clear(this);
+    PhaseformLoader.build(this, first.doc);
+    const second = PhaseformSerializer.serialize(this);
+    r.stable = JSON.stringify(first.doc) === JSON.stringify(second.doc);
+    PhaseformLoader.clear(this);
+
+    // 2. errors and warnings
+    const doc = (objects) => ({ format: 'phaseform', version: '0.1.0', key: 'T', size: { width: 400, height: 300 }, objects });
+    r.missingSource = catchMsg(() => PhaseformLoader.build(this, doc([{ id: 'a', type: 'rectangle', width: 10, height: 10, filters: { internal: [{ type: 'mask', source: 'ghost' }] } }])));
+    PhaseformLoader.clear(this);
+    const unk = PhaseformLoader.build(this, doc([{ id: 'a', type: 'rectangle', width: 10, height: 10, fill: { color: '#ffffff' }, filters: { internal: [{ type: 'sparkle' }, { type: 'pixelate', amount: 3 }] } }]));
+    r.unknownWarns = unk.warnings;
+    r.unknownKeepsLater = unk.objects[0].filters.internal.list.length === 1;
+    PhaseformLoader.clear(this);
+
+    this.cameras.main.setBackgroundColor('#000000');
+    // 3. rendering: hidden mask source, container mask, inverted texture-free mask, inactive filter
+    const R = (id, x, y, w, h, color, extra) => Object.assign({ id, type: 'rectangle', x, y, width: w, height: h, origin: { x: 0, y: 0 }, fill: { color } }, extra);
+    const I = (id, x, y, extra) => Object.assign({ id, type: 'image', key: 'red', x, y, origin: { x: 0, y: 0 } }, extra);
+    PhaseformLoader.build(this, doc([
+      R('m1', 0, 0, 50, 60, '#00ff00', { visible: false }),
+      R('a', 0, 0, 100, 60, '#ff0000', { filters: { internal: [{ type: 'mask', source: 'm1' }] } }),
+      { id: 'box', type: 'container', x: 120, y: 0, filters: { internal: [{ type: 'mask', source: 'm2' }] }, children: [R('box-child', 0, 0, 100, 60, '#0000ff')] },
+      R('m2', 120, 0, 50, 60, '#ffffff', { visible: false }),
+      R('inv', 240, 0, 100, 60, '#ff0000', { filters: { internal: [{ type: 'mask', source: 'm3', invert: true }] } }),
+      R('m3', 240, 0, 50, 60, '#ffffff', { visible: false }),
+      I('off', 0, 100, { filters: { internal: [{ type: 'threshold', edge1: 0.9, edge2: 0.9, invert: true, active: false }] } }),
+      I('on', 120, 100, { filters: { internal: [{ type: 'threshold', edge1: 0.9, edge2: 0.9, invert: true }] } }),
+      { id: 'mul', type: 'image', key: 'red', x: 240, y: 100, origin: { x: 0, y: 0 }, filters: { internal: [{ type: 'blend', texture: 'sky', blendMode: 'multiply' }] } }
+    ]));
+    const probes = { hiddenIn: [25, 30], hiddenOut: [75, 30], contIn: [145, 30], contOut: [195, 30], invLeft: [265, 30], invRight: [315, 30],
+      inactive: [50, 130], active: [170, 130], multiply: [290, 130], multiplyOutside: [290, 200] };
+    r.pixels = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (px) => { r.pixels[k] = [px.red, px.green, px.blue]; this.time.delayedCall(30, next); });
+      };
+      next();
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Check, banner: false, audio: { noAudio: true } });
+</script>

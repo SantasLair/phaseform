@@ -1,0 +1,69 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Filters",
+  "size": { "width": 800, "height": 600 },
+  "background": "#101018",
+  "objects": [
+    { "id": "backdrop", "type": "image", "key": "sky", "x": 400, "y": 300,
+      "filters": { "internal": [
+        { "type": "parallel",
+          "top": [{ "type": "threshold", "edge1": 0.6, "edge2": 0.9 }, { "type": "blur", "quality": 1, "x": 4, "y": 4 }],
+          "blend": { "blendMode": "add", "amount": 0.6 } },
+        { "type": "vignette", "radius": 0.6, "strength": 0.7, "color": "#000010" }
+      ] } },
+
+    { "id": "portrait-mask", "type": "ellipse", "x": 120, "y": 120, "width": 96, "height": 96, "visible": false,
+      "fill": { "color": "#ffffff" } },
+    { "id": "portrait", "type": "image", "key": "heart", "x": 120, "y": 120,
+      "filters": { "internal": [{ "type": "mask", "source": "portrait-mask" }] } },
+
+    { "id": "card", "type": "container", "x": 400, "y": 160,
+      "filters": {
+        "internal": [{ "type": "mask", "source": "card-clip" }],
+        "external": [{ "type": "glow", "color": "#ffcc00", "outerStrength": 6, "quality": 8, "distance": 12 }]
+      },
+      "children": [
+        { "id": "card-bg", "type": "image", "key": "panel" },
+        { "id": "card-title", "type": "text", "text": "Filters", "x": -60, "y": -20,
+          "filters": { "external": [{ "type": "shadow", "x": 2, "y": 2, "decay": 0.2, "color": "#000000", "intensity": 0.8 }] } }
+      ] },
+    { "id": "card-clip", "type": "rectangle", "x": 400, "y": 160, "width": 220, "height": 100, "visible": false,
+      "fill": { "color": "#ffffff" } },
+
+    { "id": "sepia", "type": "image", "key": "heart", "x": 80, "y": 300,
+      "filters": { "internal": [{ "type": "colorMatrix", "matrix": [0.393, 0.769, 0.189, 0, 0, 0.349, 0.686, 0.168, 0, 0, 0.272, 0.534, 0.131, 0, 0, 0, 0, 0, 1, 0], "alpha": 0.8 }] } },
+    { "id": "mixed", "type": "image", "key": "heart", "x": 160, "y": 300,
+      "filters": { "internal": [
+        { "type": "blend", "texture": "panel", "blendMode": "difference", "amount": 0.5 },
+        { "type": "combineColorMatrix", "texture": "panel" }
+      ] } },
+    { "id": "heat", "type": "image", "key": "heart", "x": 240, "y": 300,
+      "filters": { "internal": [{ "type": "gradientMap", "ramp": [
+        { "colorStart": "#000000", "colorEnd": "#ff3300", "start": 0, "end": 0.5 },
+        { "colorStart": "#ff3300", "colorEnd": "#ffff99", "start": 0.5, "end": 1 }
+      ] }] } },
+    { "id": "posterized", "type": "image", "key": "heart", "x": 320, "y": 300,
+      "filters": { "internal": [{ "type": "quantize", "steps": [4, 4, 4, 2], "mode": "hsva", "dither": true }] } },
+    { "id": "keyed", "type": "image", "key": "heart", "x": 400, "y": 300,
+      "filters": { "internal": [{ "type": "key", "color": "#00ff00", "threshold": 0.1, "feather": 0.05 }] } },
+    { "id": "edges", "type": "image", "key": "heart", "x": 480, "y": 300,
+      "filters": { "internal": [{ "type": "threshold", "edge1": [0.2, 0.3, 0.4, 0], "edge2": 0.8, "invert": [true, false, false, false] }] } },
+    { "id": "retro", "type": "image", "key": "heart", "x": 560, "y": 300,
+      "filters": { "internal": [{ "type": "pixelate", "amount": 4 }, { "type": "blocky", "size": { "x": 6, "y": 3 } }] } },
+    { "id": "lens", "type": "image", "key": "heart", "x": 640, "y": 300,
+      "filters": { "internal": [{ "type": "barrel", "amount": 1.4 }, { "type": "displacement", "texture": "sky", "x": 0.01, "y": 0.02 }] } },
+    { "id": "dreamy", "type": "image", "key": "heart", "x": 720, "y": 300,
+      "filters": { "internal": [{ "type": "bokeh", "radius": 0.4 }, { "type": "tiltShift", "blurX": 2, "active": false }] } },
+
+    { "id": "lit", "type": "image", "key": "heart", "x": 200, "y": 450,
+      "filters": { "internal": [
+        { "type": "normalTools", "rotationSource": "lit", "facingPower": 1.5 },
+        { "type": "imageLight", "normalMap": "heart", "environmentMap": "sky", "modelRotationSource": "lit", "bulge": 0.1 }
+      ] } },
+    { "id": "sky-ball", "type": "image", "key": "sky", "x": 400, "y": 450, "scale": { "x": 0.25, "y": 0.25 },
+      "filters": { "internal": [{ "type": "panoramaBlur", "radius": 0.5, "samplesX": 16, "samplesY": 8 }] } },
+    { "id": "transition", "type": "image", "key": "panel", "x": 600, "y": 450,
+      "filters": { "external": [{ "type": "wipe", "progress": 0.3, "direction": "top-to-bottom", "reveal": true, "texture": "sky" }] } }
+  ]
+}

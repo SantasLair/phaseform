@@ -1,9 +1,11 @@
 // Checks the docs/PROJECT.md rules that JSON Schema cannot express. Prototype of the loader's validation pass.
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { filtersOf } from './check-scene.mjs';
 
 const TEXTURE_TYPES = new Set(['image', 'spritesheet', 'atlas', 'bitmapFont']); // a bitmap font's image is added to the texture manager under its key
 const IMAGE_REF_TYPES = new Set(['image', 'spritesheet', 'atlas']);
+const FILTER_TEXTURE_FIELDS = ['texture', 'normalMap', 'environmentMap'];
 
 function* walk(objects) {
   for (const o of objects ?? []) {
@@ -60,6 +62,14 @@ export function checkProject(projectPath) {
 
     // texture references and frames (warnings)
     for (const o of walk(scene.objects)) {
+      for (const f of filtersOf(o)) {
+        for (const field of FILTER_TEXTURE_FIELDS) {
+          const k = f[field];
+          if (k === undefined) continue;
+          if (!textures.has(k) || !IMAGE_REF_TYPES.has(textures.get(k).type)) warnings.push(`scene "${entry.key}": object "${o.id}" ${f.type} filter uses texture "${k}" not in the manifest`);
+          else if (entry.assets && !entry.assets.includes(k)) warnings.push(`scene "${entry.key}": object "${o.id}" ${f.type} filter uses texture "${k}" not in the scene's asset list`);
+        }
+      }
       if (o.type === 'bitmapText') {
         const f = textures.get(o.font);
         if (!f || f.type !== 'bitmapFont') warnings.push(`scene "${entry.key}": object "${o.id}" uses font "${o.font}" not a bitmapFont in the manifest`);

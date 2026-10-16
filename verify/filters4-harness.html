@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<title>phaseform filters probe 4</title>
+<script>
+// Probes blend filter coverage: internal filters on an image stay in its bounds; on a shape they cover the camera view.
+// Query: ?mode=<BlendModes number>&img=1 for an image instead of a rectangle.
+window.__results = null;
+class P extends Phaser.Scene {
+  preload() { const c = this.textures.createCanvas('sky', 256, 128); c.context.fillStyle = '#3366cc'; c.context.fillRect(0, 0, 256, 128); c.refresh(); }
+  create() {
+    const mode = Number(new URLSearchParams(location.search).get('mode') || 11);
+    const c2 = this.textures.createCanvas('red', 100, 60); c2.context.fillStyle = '#ff0000'; c2.context.fillRect(0, 0, 100, 60); c2.refresh();
+    const o = new URLSearchParams(location.search).get('img') ? this.add.image(240, 100, 'red').setOrigin(0) : this.add.rectangle(240, 100, 100, 60, 0xff0000).setOrigin(0);
+    o.enableFilters().filters.internal.addBlend('sky', mode);
+    const pts = { inside: [290, 130], left: [100, 130], above: [290, 20] };
+    const r = { pixels: {} }; const keys = Object.keys(pts);
+    this.time.delayedCall(300, () => { const next = () => { const k = keys.shift(); if (!k) { window.__results = r; return; }
+      this.renderer.snapshotPixel(pts[k][0], pts[k][1], (p) => { r.pixels[k] = [p.red, p.green, p.blue, p.alpha]; this.time.delayedCall(30, next); }); }; next(); });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: P, banner: false, audio: { noAudio: true } });
+</script>

@@ -125,6 +125,7 @@
         },
         "placeholder": { "$ref": "#/$defs/placeholder" },
         "extensions": { "$ref": "#/$defs/extensions" },
+        "filters": { "$ref": "#/$defs/filters" },
         "children": {
           "type": "array",
           "items": { "$ref": "#/$defs/object" },
@@ -429,6 +430,1138 @@
         }
       },
       "additionalProperties": true
+    },
+
+    "filters": {
+      "type": "object",
+      "properties": {
+        "internal": {
+          "$ref": "#/$defs/filterList"
+        },
+        "external": {
+          "$ref": "#/$defs/filterList"
+        }
+      },
+      "additionalProperties": true,
+      "description": "Phaser 4 filters, including masks. internal follows the object; external works in camera space. See docs/SPEC.md (Filters and masks)."
+    },
+    "filterList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/filter"
+      },
+      "description": "Filters applied in array order."
+    },
+    "filterBlendMode": {
+      "enum": [
+        "normal",
+        "add",
+        "multiply",
+        "screen",
+        "overlay",
+        "darken",
+        "lighten",
+        "color-dodge",
+        "color-burn",
+        "hard-light",
+        "soft-light",
+        "difference",
+        "exclusion",
+        "hue",
+        "saturation",
+        "color",
+        "luminosity",
+        "erase",
+        "source-in",
+        "source-out",
+        "source-atop",
+        "destination-over",
+        "destination-in",
+        "destination-out",
+        "destination-atop",
+        "lighter",
+        "copy",
+        "xor"
+      ],
+      "description": "All Phaser blend modes. The blend filter renders them with its own shader."
+    },
+    "colorBand": {
+      "type": "object",
+      "properties": {
+        "colorStart": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/color"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            }
+          ]
+        },
+        "colorEnd": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/color"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            }
+          ]
+        },
+        "start": {
+          "type": "number",
+          "default": 0
+        },
+        "middle": {
+          "type": "number",
+          "default": 0.5
+        },
+        "end": {
+          "type": "number",
+          "default": 1
+        },
+        "size": {
+          "type": "number"
+        },
+        "interpolation": {
+          "type": "number",
+          "default": 0
+        },
+        "colorSpace": {
+          "type": "number",
+          "default": 0
+        }
+      },
+      "additionalProperties": true,
+      "description": "A band of Phaser's ColorRamp."
+    },
+    "filter": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filter type. Unknown types are skipped by loaders and kept on save."
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "barrel"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "blend"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "texture": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "blendMode": {
+                "$ref": "#/$defs/filterBlendMode",
+                "default": "normal"
+              },
+              "amount": {
+                "type": "number",
+                "default": 1
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "blocky"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "size": {
+                "$ref": "#/$defs/vec2"
+              },
+              "offset": {
+                "$ref": "#/$defs/vec2"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "blur"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "quality": {
+                "type": "number",
+                "default": 0
+              },
+              "x": {
+                "type": "number",
+                "default": 2
+              },
+              "y": {
+                "type": "number",
+                "default": 2
+              },
+              "strength": {
+                "type": "number",
+                "default": 1
+              },
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "steps": {
+                "type": "number",
+                "default": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "bokeh"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "radius": {
+                "type": "number",
+                "default": 0.5
+              },
+              "amount": {
+                "type": "number",
+                "default": 1
+              },
+              "contrast": {
+                "type": "number",
+                "default": 0.2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "colorMatrix"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "matrix": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 20,
+                "maxItems": 20,
+                "description": "4x5 color matrix, row by row. Default identity."
+              },
+              "alpha": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "combineColorMatrix"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "texture": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "matrixSelf": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 20,
+                "maxItems": 20,
+                "description": "4x5 color matrix, row by row. Default identity."
+              },
+              "matrixTransfer": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 20,
+                "maxItems": 20,
+                "description": "4x5 color matrix, row by row. Default identity."
+              },
+              "additions": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  1,
+                  1,
+                  1,
+                  0
+                ]
+              },
+              "multiplications": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "displacement"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "texture": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "x": {
+                "type": "number",
+                "default": 0.005
+              },
+              "y": {
+                "type": "number",
+                "default": 0.005
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "glow"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "outerStrength": {
+                "type": "number",
+                "default": 4
+              },
+              "innerStrength": {
+                "type": "number",
+                "default": 0
+              },
+              "scale": {
+                "type": "number",
+                "default": 1
+              },
+              "knockout": {
+                "type": "boolean",
+                "default": false
+              },
+              "quality": {
+                "type": "number",
+                "description": "Default: game config glowQuality (10)."
+              },
+              "distance": {
+                "type": "number",
+                "description": "Default: game config glowDistance (10)."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gradientMap"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ramp": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/colorBand"
+                },
+                "minItems": 1
+              },
+              "dither": {
+                "type": "boolean",
+                "default": false
+              },
+              "color": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "colorFactor": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  0.3,
+                  0.6,
+                  0.1,
+                  0
+                ]
+              },
+              "unpremultiply": {
+                "type": "boolean",
+                "default": true
+              },
+              "alpha": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "imageLight"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "normalMap": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "environmentMap": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "modelRotation": {
+                "type": "number",
+                "default": 0
+              },
+              "modelRotationSource": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Id of an object in the same scene."
+              },
+              "bulge": {
+                "type": "number",
+                "default": 0
+              },
+              "colorFactor": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "default": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "key"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "alpha": {
+                "type": "number",
+                "default": 1
+              },
+              "isolate": {
+                "type": "boolean",
+                "default": false
+              },
+              "threshold": {
+                "type": "number",
+                "default": 0.0625
+              },
+              "feather": {
+                "type": "number",
+                "default": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mask"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Id of an object in the same scene."
+              },
+              "texture": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              },
+              "invert": {
+                "type": "boolean",
+                "default": false
+              },
+              "viewTransform": {
+                "enum": [
+                  "world",
+                  "local"
+                ],
+                "default": "world"
+              },
+              "scaleFactor": {
+                "type": "number",
+                "default": 1,
+                "exclusiveMinimum": 0
+              },
+              "autoUpdate": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "normalTools"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "rotation": {
+                "type": "number",
+                "default": 0
+              },
+              "rotationSource": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Id of an object in the same scene."
+              },
+              "facingPower": {
+                "type": "number",
+                "default": 1
+              },
+              "outputRatio": {
+                "type": "boolean",
+                "default": false
+              },
+              "ratioVector": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3,
+                "default": [
+                  0,
+                  0,
+                  1
+                ]
+              },
+              "ratioRadius": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "panoramaBlur"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "radius": {
+                "type": "number",
+                "default": 1
+              },
+              "samplesX": {
+                "type": "number",
+                "default": 32
+              },
+              "samplesY": {
+                "type": "number",
+                "default": 16
+              },
+              "power": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "parallel"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "top": {
+                "$ref": "#/$defs/filterList"
+              },
+              "bottom": {
+                "$ref": "#/$defs/filterList"
+              },
+              "blend": {
+                "type": "object",
+                "properties": {
+                  "blendMode": {
+                    "$ref": "#/$defs/filterBlendMode",
+                    "default": "normal"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "default": 1
+                  },
+                  "color": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "default": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ]
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "pixelate"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "quantize"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  8,
+                  8,
+                  8,
+                  8
+                ]
+              },
+              "gamma": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "offset": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "default": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "mode": {
+                "enum": [
+                  "rgba",
+                  "hsva"
+                ],
+                "default": "rgba"
+              },
+              "dither": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "shadow"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "x": {
+                "type": "number",
+                "default": 0
+              },
+              "y": {
+                "type": "number",
+                "default": 0
+              },
+              "decay": {
+                "type": "number",
+                "default": 0.1
+              },
+              "power": {
+                "type": "number",
+                "default": 1
+              },
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "samples": {
+                "type": "number",
+                "default": 6
+              },
+              "intensity": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "threshold"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "edge1": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  }
+                ]
+              },
+              "edge2": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  }
+                ]
+              },
+              "invert": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "boolean"
+                    },
+                    "minItems": 4,
+                    "maxItems": 4
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tiltShift"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "radius": {
+                "type": "number",
+                "default": 0.5
+              },
+              "amount": {
+                "type": "number",
+                "default": 1
+              },
+              "contrast": {
+                "type": "number",
+                "default": 0.2
+              },
+              "blurX": {
+                "type": "number",
+                "default": 1
+              },
+              "blurY": {
+                "type": "number",
+                "default": 1
+              },
+              "strength": {
+                "type": "number",
+                "default": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "vignette"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "x": {
+                "type": "number",
+                "default": 0.5
+              },
+              "y": {
+                "type": "number",
+                "default": 0.5
+              },
+              "radius": {
+                "type": "number",
+                "default": 0.5
+              },
+              "strength": {
+                "type": "number",
+                "default": 0.5
+              },
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "blendMode": {
+                "$ref": "#/$defs/blendMode",
+                "default": "normal"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "wipe"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "progress": {
+                "type": "number",
+                "default": 0
+              },
+              "wipeWidth": {
+                "type": "number",
+                "default": 0.1
+              },
+              "direction": {
+                "enum": [
+                  "left-to-right",
+                  "right-to-left",
+                  "top-to-bottom",
+                  "bottom-to-top"
+                ],
+                "default": "left-to-right"
+              },
+              "reveal": {
+                "type": "boolean",
+                "default": false
+              },
+              "texture": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Asset key from the project manifest."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mask"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "source",
+                "texture"
+              ]
+            }
+          }
+        }
+      ]
     }
   }
 }

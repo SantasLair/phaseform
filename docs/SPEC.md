@@ -13,6 +13,7 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Bitmap text](#bitmap-text)
 - [Shapes](#shapes)
 - [Scripts and code-driven objects](#scripts-and-code-driven-objects)
+- [Filters and masks](#filters-and-masks)
 - [Conventions](#conventions)
 - [Extensions](#extensions)
 - [Versioning](#versioning)
@@ -88,6 +89,7 @@ These apply to every object, including containers.
 | `params` | no | none | Plain JSON passed to the scripts. |
 | `placeholder` | no | none | Editor-only reference visual. Never drawn by a loader. |
 | `extensions` | no | none | Extension data, keyed by extension name. |
+| `filters` | no | none | Filters and masks, see [Filters and masks](#filters-and-masks). |
 
 On a container, `scrollFactor` affects the container only, not its children.
 
@@ -263,6 +265,97 @@ Some objects have no appearance that data can describe: a health bar redrawn fro
 ### Serializing live scenes
 
 A serializer cannot recover draw code from a live scene. A `Graphics` object serializes as a `graphics` node with its common fields and no placeholder, and what it drew is lost.
+
+## Filters and masks
+
+Phaser 4 replaces masks and post effects with one system: filters. A mask is one kind of filter. Any object, including a container, may have a `filters` field:
+
+```json
+"filters": {
+  "internal": [
+    { "type": "mask", "source": "panel-shape" },
+    { "type": "blur", "x": 4, "y": 4 }
+  ],
+  "external": [
+    { "type": "glow", "color": "#ffcc00", "outerStrength": 6 }
+  ]
+}
+```
+
+- **Two lists.** `internal` and `external` map to Phaser's `filters.internal` and `filters.external`. Internal filters run first, before the object's transform: a horizontal blur on an object rotated 45 degrees appears at 45 degrees. External filters run after it, so the same blur appears horizontal. External filters cover the full screen and cost more, so Phaser recommends internal filters where possible. Either list may be absent or empty.
+- **Order.** Each list applies in array order. The loader calls `enableFilters()` and then the matching `add...` method for each entry in turn. Filters are added once every object in the scene exists, because a mask source can be any object, and before any script `create` hook runs, so scripts see the filters and can animate them.
+- **Containers.** A filter on a container applies to the container's rendered children as a whole.
+- **Filter area.** Phaser renders internal filters into a framebuffer focused on the object. Objects without well-defined bounds (containers, graphics and all shapes) get Phaser's `filtersFocusContext` instead, so their internal filters cover the whole camera view, like external filters. A filter that changes transparent pixels (an inverted `threshold`, a `blend` texture) then affects the whole view, not just the object. Images, sprites, tile sprites and text keep their filters inside their bounds.
+- **Defaults.** Every field except `type` is optional. Absent fields take Phaser's default, listed below.
+- **Unknown filter types.** A loader skips an entry whose `type` it does not know, warns, and keeps the entry when saving. Later entries still load.
+
+### Common filter fields
+
+| Field | Default | Description |
+|---|---|---|
+| `type` | | Filter type, from the table below. Required. |
+| `active` | `true` | `false` keeps the filter in the list but does not render it. Editors use this to toggle an effect. |
+
+### Value conventions
+
+- **Colors** are `#rrggbb` where Phaser accepts a single color (`blur`, `glow`, `shadow`, `vignette`, `key`, ramp bands).
+- **Channel vectors** are arrays of numbers from 0 to 1, as Phaser stores them, in RGBA order unless noted.
+- **Textures** are asset keys from the project manifest. Absent means Phaser's built-in default texture for that filter.
+- **Object references** are object `id`s in the same scene, at any depth. A reference to a missing id is an error.
+- **Blend modes** are lowercase names with hyphens, as for `blendMode` on objects.
+
+### Filter types
+
+| `type` | Fields (default) |
+|---|---|
+| `barrel` | `amount` (1) |
+| `blend` | `texture`, `blendMode` (`normal`), `amount` (1), `color` ([1, 1, 1, 1]) |
+| `blocky` | `size` (`{ "x": 4, "y": 4 }`), `offset` (`{ "x": 0, "y": 0 }`) |
+| `blur` | `quality` (0), `x` (2), `y` (2), `strength` (1), `color` (`#ffffff`), `steps` (4) |
+| `bokeh` | `radius` (0.5), `amount` (1), `contrast` (0.2) |
+| `colorMatrix` | `matrix` (identity, 20 numbers), `alpha` (1) |
+| `combineColorMatrix` | `texture`, `matrixSelf`, `matrixTransfer` (identity, 20 numbers each), `additions` ([1, 1, 1, 0]), `multiplications` ([0, 0, 0, 1]) |
+| `displacement` | `texture`, `x` (0.005), `y` (0.005) |
+| `glow` | `color` (`#ffffff`), `outerStrength` (4), `innerStrength` (0), `scale` (1), `knockout` (false), `quality`, `distance` |
+| `gradientMap` | `ramp` (one band, black to white), `dither` (false), `color` ([0, 0, 0, 0]), `colorFactor` ([0.3, 0.6, 0.1, 0]), `unpremultiply` (true), `alpha` (1) |
+| `imageLight` | `normalMap`, `environmentMap`, `modelRotation` (0), `modelRotationSource`, `bulge` (0), `colorFactor` ([1, 1, 1]) |
+| `key` | `color` (`#ffffff`), `alpha` (1), `isolate` (false), `threshold` (0.0625), `feather` (0) |
+| `mask` | `source` or `texture`, `invert` (false), `viewTransform` (`world`), `scaleFactor` (1), `autoUpdate` (true) |
+| `normalTools` | `rotation` (0), `rotationSource`, `facingPower` (1), `outputRatio` (false), `ratioVector` ([0, 0, 1]), `ratioRadius` (1) |
+| `panoramaBlur` | `radius` (1), `samplesX` (32), `samplesY` (16), `power` (1) |
+| `parallel` | `top`, `bottom` (filter lists), `blend` (`{ blendMode, amount, color }` as in `blend`) |
+| `pixelate` | `amount` (1) |
+| `quantize` | `steps` ([8, 8, 8, 8]), `gamma` ([1, 1, 1, 1]), `offset` ([0, 0, 0, 0]), `mode` (`rgba`), `dither` (false) |
+| `shadow` | `x` (0), `y` (0), `decay` (0.1), `power` (1), `color` (`#000000`), `samples` (6), `intensity` (1) |
+| `threshold` | `edge1` (0.5), `edge2` (0.5), `invert` (false) |
+| `tiltShift` | `radius` (0.5), `amount` (1), `contrast` (0.2), `blurX` (1), `blurY` (1), `strength` (1) |
+| `vignette` | `x` (0.5), `y` (0.5), `radius` (0.5), `strength` (0.5), `color` (`#000000`), `blendMode` (`normal`) |
+| `wipe` | `progress` (0), `wipeWidth` (0.1), `direction` (`left-to-right`), `reveal` (false), `texture` |
+
+Notes:
+
+- **`mask`.** Give exactly one of `source` (an object id) or `texture` (an asset key). With neither, Phaser masks with a plain white texture, which hides nothing. See [Masks](#masks).
+- **`blend`.** Uses its own shader, so `blendMode` accepts all of Phaser's blend modes: `normal`, `add`, `multiply`, `screen`, `overlay`, `darken`, `lighten`, `color-dodge`, `color-burn`, `hard-light`, `soft-light`, `difference`, `exclusion`, `hue`, `saturation`, `color`, `luminosity`, `erase`, `source-in`, `source-out`, `source-atop`, `destination-over`, `destination-in`, `destination-out`, `destination-atop`, `lighter`, `copy`, `xor`. This is the core route to modes that object `blendMode` does not offer. The mode applies to all four channels, alpha included: `difference` of two opaque inputs has alpha 0, so the result is transparent. Lower the alpha in `color` to change that.
+- **`vignette`.** `blendMode` is limited to `normal`, `add`, `multiply` and `screen`, as Phaser documents.
+- **`glow`.** When absent, `quality` and `distance` come from the game config (`glowQuality` and `glowDistance`, both 10 by default). Phaser builds the shader from them, so they are fixed once the filter is created.
+- **`gradientMap.ramp`.** An array of color bands, each with `colorStart`, `colorEnd` (`#rrggbb` or a channel vector), `start`, `middle`, `end` or `size`, `interpolation` and `colorSpace`, passed to Phaser's `ColorRamp`.
+- **`threshold`.** `edge1`, `edge2` and `invert` take either one value for all channels or an array of four.
+- **`quantize.mode`.** `rgba` or `hsva`.
+- **`wipe`.** `direction` is `left-to-right`, `right-to-left`, `top-to-bottom` or `bottom-to-top`, matching Phaser's `setLeftToRight()` and related methods. (Phaser's constructor docs disagree with those methods about which `direction` number means top to bottom. The methods are the reference.) With `reveal: false` the input shows in the unwiped area; with `reveal: true` it shows in the wiped area. `texture` is drawn where the input is not shown. Absent, that area is blank. Animate `progress` with a script or tween.
+- **`imageLight`, `normalTools`.** `modelRotationSource` and `rotationSource` are object ids. Phaser also accepts a callback, which is code and is not in the spec.
+- **`parallel`.** Runs the `top` and `bottom` lists separately on the same input, then blends the `top` result over the `bottom` result with `blend`. An empty or absent list passes the input through unchanged. Example: a bloom is `top: [threshold, blur]` with `blend.blendMode: "add"`.
+- **Left out:** `sampler` (it takes a callback), a filter's `viewCamera`, and `paddingOverride`. A serializer reports them as lossy.
+
+### Masks
+
+A `mask` filter with `source` renders the referenced object into a texture and uses that texture's alpha to hide parts of the filtered object.
+
+- **The source object is still an ordinary object.** If it is visible, it draws where it is, as well as acting as a mask. That is Phaser's behavior, and PHASEFORM does not change it. To use an object only as a mask, set `visible: false`: a hidden source still masks.
+- **Alpha counts.** The mask uses the source's rendered alpha, so a source with `alpha: 0` hides everything.
+- **Transform.** With the default `viewTransform: "world"` the source is placed at its world position, including any parent containers. `local` uses the source's own transform and ignores its parents.
+- **Sharing.** One source may mask several objects.
+- **Texture masks.** With `texture`, the texture is stretched over the filter's area: the camera view for an external mask, or for an object without well-defined bounds (see Filter area above). Prefer `source` for masks that must line up with an object.
+- **Cycles.** An object must not be the mask source for itself or one of its ancestors. A loader rejects such a cycle.
 
 ## Conventions
 

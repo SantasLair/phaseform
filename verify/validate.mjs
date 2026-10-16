@@ -1,6 +1,6 @@
 // Validates examples against both schemas, then runs the cross-file project rules.
-//   examples/*.phaseform.json            scenes, must pass
-//   examples/invalid/*.json              scenes, must fail
+//   examples/*.phaseform.json            scenes, must pass the schema and the scene rules
+//   examples/invalid/*.json              scenes, must fail the schema or the scene rules
 //   examples/phaseform.project.json      project, must pass schema and rules with no errors or warnings
 //   examples/invalid-project/*.project.json  projects, must fail the schema or the rules
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -8,6 +8,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkProject } from './check-project.mjs';
+import { checkScene } from './check-scene.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -22,11 +23,16 @@ const report = (pass, label, name, detail) => {
 };
 
 for (const f of readdirSync(join(root, 'examples')).filter(f => f.endsWith('.phaseform.json'))) {
-  const ok = validateScene(load('examples', f));
-  report(ok, 'valid scene', f, ok ? '' : JSON.stringify(validateScene.errors));
+  const doc = load('examples', f);
+  const ok = validateScene(doc);
+  const { errors } = ok ? checkScene(doc) : { errors: [] };
+  report(ok && !errors.length, 'valid scene', f, ok ? errors.join('; ') : JSON.stringify(validateScene.errors));
 }
 for (const f of readdirSync(join(root, 'examples', 'invalid')).filter(f => f.endsWith('.json'))) {
-  report(!validateScene(load('examples', 'invalid', f)), 'invalid scene', f);
+  const doc = load('examples', 'invalid', f);
+  const schemaOk = validateScene(doc);
+  const why = schemaOk ? (checkScene(doc).errors[0] ?? 'NOT REJECTED') : 'schema';
+  report(why !== 'NOT REJECTED', 'invalid scene', f, `(${why})`);
 }
 
 {

@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform filters probe 5</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Probes the area an internal filter covers, per object type: an inverted threshold turns transparent black into
+// white wherever the filter renders, so a white pixel far from the object means the filter covers the camera view.
+// Query: ?type=<image|sprite|tileSprite|text|bitmapText|container|graphics|rectangle|ellipse|star|arc|polygon|line|triangle>
+window.__results = null;
+class P extends Phaser.Scene {
+  preload() { const c = this.textures.createCanvas('red', 40, 40); c.context.fillStyle = '#ff0000'; c.context.fillRect(0, 0, 40, 40); c.refresh(); }
+  create() {
+    const t = new URLSearchParams(location.search).get('type');
+    const make = {
+      image: () => this.add.image(200, 150, 'red'), sprite: () => this.add.sprite(200, 150, 'red'), tileSprite: () => this.add.tileSprite(200, 150, 40, 40, 'red'),
+      text: () => this.add.text(200, 150, 'Hi', { color: '#ff0000' }), container: () => this.add.container(200, 150, [this.add.image(0, 0, 'red')]),
+      graphics: () => { const g = this.add.graphics({ x: 200, y: 150 }); g.fillStyle(0xff0000).fillRect(0, 0, 40, 40); return g; },
+      rectangle: () => this.add.rectangle(200, 150, 40, 40, 0xff0000), ellipse: () => this.add.ellipse(200, 150, 40, 40, 0xff0000),
+      star: () => this.add.star(200, 150, 5, 10, 20, 0xff0000), arc: () => this.add.arc(200, 150, 20, 0, 360, false, 0xff0000),
+      polygon: () => this.add.polygon(200, 150, [0, 0, 40, 0, 20, 40], 0xff0000), triangle: () => this.add.triangle(200, 150, 0, 40, 40, 40, 20, 0, 0xff0000),
+      line: () => this.add.line(200, 150, 0, 0, 40, 0, 0xff0000).setLineWidth(4)
+    };
+    const o = make[t]();
+    o.enableFilters().filters.internal.addThreshold(0.9, 0.9, true);
+    const r = { type: t, pixels: {} };
+    this.time.delayedCall(300, () => this.renderer.snapshotPixel(20, 20, (p) => { r.pixels.farCorner = [p.red, p.green, p.blue]; window.__results = r; }));
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: P, banner: false, audio: { noAudio: true } });
+</script>

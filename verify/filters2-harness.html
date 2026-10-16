@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform filters probe 2</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Probes mask sources that are hidden, inside containers, and filters on containers. Results land in window.__results.
+window.__results = null;
+class Probe extends Phaser.Scene {
+  constructor() { super('Probe'); }
+  create() {
+    const r = {};
+    const R = (x, y, w, h, c) => this.add.rectangle(x, y, w, h, c).setOrigin(0);
+    // A: hidden (visible false) mask source on the display list, covering the left half of a red rect at (0,0,100,60)
+    const a = R(0, 0, 100, 60, 0xff0000); const aSrc = R(0, 0, 50, 60, 0x00ff00).setVisible(false);
+    a.enableFilters().filters.internal.addMask(aSrc);
+    // B: alpha 0 mask source
+    const b = R(110, 0, 100, 60, 0xff0000); const bSrc = R(110, 0, 50, 60, 0x00ff00).setAlpha(0);
+    b.enableFilters().filters.internal.addMask(bSrc);
+    // C: container (at 220,0) with a blue child, world-mask from an off-list rect covering x 220..270
+    const c = this.add.container(220, 0); c.add(R(0, 0, 100, 60, 0x0000ff));
+    c.enableFilters().filters.internal.addMask(new Phaser.GameObjects.Rectangle(this, 220, 0, 50, 60, 0xffffff).setOrigin(0));
+    // D: container (at 0,80) with a blue child, no filters added but enableFilters called
+    const d = this.add.container(0, 80); d.add(R(0, 0, 100, 60, 0x0000ff)); d.enableFilters();
+    // E: container (at 110,80) with a threshold filter that should turn blue (0,0,255) into (0,0,255)->threshold 0.5 each channel => blue stays, red/green 0
+    //    use red child 0x800000 (0.5 red) to check threshold applied: edge 0.4 -> red becomes 255
+    const e = this.add.container(110, 80); e.add(R(0, 0, 100, 60, 0x660000)); e.enableFilters().filters.internal.addThreshold(0.3, 0.3);
+    // F: mask source inside a container: container at (220,80) holds the source rect at local (0,0,50,60); red rect at world (220,80,100,60)
+    const f = R(220, 80, 100, 60, 0xff0000); const fCont = this.add.container(220, 80); const fSrc = R(0, 0, 50, 60, 0x00ff00).setVisible(false); fCont.add(fSrc);
+    f.enableFilters().filters.internal.addMask(fSrc);
+    // G: external list mask
+    const g = R(0, 160, 100, 60, 0xff0000); g.enableFilters().filters.external.addMask(new Phaser.GameObjects.Rectangle(this, 0, 160, 50, 60, 0xffffff).setOrigin(0));
+    // H: the same source used as mask for two objects
+    const hSrc = new Phaser.GameObjects.Rectangle(this, 110, 160, 50, 140, 0xffffff).setOrigin(0);
+    const h1 = R(110, 160, 100, 60, 0xff0000); h1.enableFilters().filters.internal.addMask(hSrc);
+    const h2 = R(110, 230, 100, 60, 0xff0000); h2.enableFilters().filters.internal.addMask(hSrc);
+    // I: texture-key mask (white 8x8 generated texture -> stretched over the object?)
+    const gr = this.add.graphics(); gr.fillStyle(0xffffff).fillRect(0, 0, 4, 8); gr.generateTexture('half', 8, 8); gr.destroy();
+    const i = R(220, 160, 100, 60, 0xff0000); i.enableFilters().filters.internal.addMask('half');
+    r.order = { enableFiltersReturns: typeof a.enableFilters, hasFiltersBefore: R(0, 0, 1, 1, 0).filters === undefined ? 'undefined' : String(R(0, 0, 1, 1, 0).filters) };
+    const probes = {
+      hiddenIn: [25, 30], hiddenOut: [75, 30], alpha0In: [135, 30], alpha0Out: [185, 30],
+      contMaskIn: [245, 30], contMaskOut: [295, 30], contNoFilter: [50, 110], contThreshold: [160, 110],
+      srcInContIn: [245, 110], srcInContOut: [295, 110], externalIn: [25, 190], externalOut: [75, 190],
+      shared1In: [135, 190], shared1Out: [185, 190], shared2In: [135, 260], shared2Out: [185, 260],
+      texMaskLeft: [235, 190], texMaskRight: [305, 190]
+    };
+    r.pixels = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (px) => { r.pixels[k] = [px.red, px.green, px.blue]; this.time.delayedCall(30, next); });
+      };
+      next();
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Probe, banner: false, audio: { noAudio: true } });
+</script>

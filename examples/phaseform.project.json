@@ -13,6 +13,11 @@
       "key": "CoreFields",
       "path": "05-core-fields.phaseform.json",
       "assets": ["spark", "sky", "heart"]
+    },
+    {
+      "key": "Filters",
+      "path": "10-filters.phaseform.json",
+      "assets": ["sky", "heart", "panel"]
     }
   ],
   "assets": [

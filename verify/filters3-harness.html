@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform filters probe 3</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Probes texture-key masks, filter color accessors and ParallelFilters. Results land in window.__results.
+window.__results = null;
+class Probe extends Phaser.Scene {
+  constructor() { super('Probe'); }
+  preload() {
+    // a 64x64 canvas texture: left half opaque white, right half transparent
+    const c = this.textures.createCanvas('half', 64, 64);
+    c.context.fillStyle = '#ffffff'; c.context.fillRect(0, 0, 32, 64); c.refresh();
+  }
+  create() {
+    const r = {};
+    const R = (x, y, w, h, col) => this.add.rectangle(x, y, w, h, col).setOrigin(0);
+    // internal texture mask on a 100x60 rect at (0,0)
+    const a = R(0, 0, 100, 60, 0xff0000); a.enableFilters().filters.internal.addMask('half');
+    // internal texture mask on an image of the same texture size
+    const b = this.add.image(150, 0, 'half').setOrigin(0).setTint(0xff0000).setTintMode(Phaser.TintModes.FILL);
+    // external texture mask on a rect at (0,100)
+    const c = R(0, 100, 400, 60, 0x00ff00); c.enableFilters().filters.external.addMask('half');
+    const probes = { a10: [10, 30], a40: [40, 30], a60: [60, 30], a90: [90, 30], b10: [160, 30], b50: [200, 30], c50: [50, 130], c150: [150, 130], c250: [250, 130], c350: [350, 130] };
+    r.pixels = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (px) => { r.pixels[k] = [px.red, px.green, px.blue]; this.time.delayedCall(30, next); });
+      };
+      next();
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Probe, banner: false, audio: { noAudio: true } });
+</script>
