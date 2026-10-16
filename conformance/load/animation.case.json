@@ -1,0 +1,181 @@
+{
+ "description": "A sprite with an animation plays it, starting at startFrame (0-based). Project animations are created once, before the scene is built.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "animations": [
+  {
+   "key": "spin",
+   "frameRate": 10,
+   "repeat": -1,
+   "frames": [
+    {
+     "key": "sheet",
+     "frame": 0
+    },
+    {
+     "key": "sheet",
+     "frame": 1
+    }
+   ]
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Animation",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "from0",
+    "type": "sprite",
+    "key": "sheet",
+    "animation": {
+     "key": "spin"
+    }
+   },
+   {
+    "id": "from1",
+    "type": "sprite",
+    "key": "sheet",
+    "animation": {
+     "key": "spin",
+     "startFrame": 1
+    }
+   },
+   {
+    "id": "idle",
+    "type": "sprite",
+    "key": "sheet",
+    "frame": 1
+   },
+   {
+    "id": "undefined-key",
+    "type": "sprite",
+    "key": "sheet",
+    "animation": {
+     "key": "nope"
+    }
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "from0",
+    "type": "Sprite",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "sheet",
+    "frame": 0,
+    "animation": "spin",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "from1",
+    "type": "Sprite",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "sheet",
+    "frame": 1,
+    "animation": "spin",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "idle",
+    "type": "Sprite",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "sheet",
+    "frame": 1,
+    "animation": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "undefined-key",
+    "type": "Sprite",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "sheet",
+    "frame": 0,
+    "animation": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 1
+ }
+}

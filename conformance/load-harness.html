@@ -21,7 +21,10 @@ window.runCase = (c) => new Promise((resolve) => {
           for (let i = 0; i * t.frameWidth < t.width; i++) tex.add(i, 0, i * t.frameWidth, 0, t.frameWidth, t.frameHeight);
         } else this.textures.createCanvas(t.key, t.width, t.height);
       }
-      const built = PhaseformLoader.build(this, c.scene, {});
+      // module sources are function bodies that return { create, update }, so a case can carry its scripts as plain text
+      const modules = {};
+      for (const [p, src] of Object.entries(c.modules || {})) modules[p] = new Function(src)();
+      const built = PhaseformLoader.build(this, c.scene, { modules, animations: c.animations || [] });
       const ids = new Map([...built.byId].map(([id, o]) => [o, id]));
       const dump = (o, parent) => {
         const isShape = o.isFilled !== undefined;
@@ -33,6 +36,13 @@ window.runCase = (c) => new Promise((resolve) => {
         if (o.type === 'Image' || o.type === 'Sprite' || o.type === 'Text') { r.flipX = o.flipX; r.flipY = o.flipY; r.tint = o.isTinted ? hex(o.tintTopLeft) : null; r.tintMode = TINTMODE[o.tintMode]; }
         if (o.type === 'Image' || o.type === 'Sprite') { r.texture = o.texture.key; r.frame = o.frame.name; }
         if (o.type === 'Text') r.text = o.text;
+        if (o.type === 'TileSprite') { r.width = o.width; r.height = o.height; r.tilePositionX = o.tilePositionX; r.tilePositionY = o.tilePositionY; r.tileScaleX = o.tileScaleX; r.tileScaleY = o.tileScaleY; r.tileRotation = o.tileRotation; r.texture = o.texture.key; r.frame = o.frame.name; }
+        if (o.type === 'Sprite') r.animation = o.anims.currentAnim ? o.anims.currentAnim.key : null;
+        if (o.filters) {
+          // the minified Phaser build renames classes, so find each filter's class by its constructor in Phaser.Filters
+          const kind = (f) => { const n = Object.keys(Phaser.Filters).find(k => f.constructor === Phaser.Filters[k]) || f.constructor.name; return n[0].toLowerCase() + n.slice(1); };
+          r.filters = { internal: o.filters.internal.list.map(f => ({ type: kind(f), active: f.active })), external: o.filters.external.list.map(f => ({ type: kind(f), active: f.active })) };
+        }
         if (isShape) { r.fill = o.isFilled ? { color: hex(o.fillColor), alpha: o.fillAlpha } : null; r.stroke = o.isStroked ? { width: o.lineWidth, color: hex(o.strokeColor), alpha: o.strokeAlpha } : null; }
         r.blendMode = o.blendMode === -1 ? null : BLEND[o.blendMode] ?? o.blendMode; // containers inherit: null
         r.scrollFactorX = o.scrollFactorX; r.scrollFactorY = o.scrollFactorY;
@@ -45,7 +55,12 @@ window.runCase = (c) => new Promise((resolve) => {
       const walk = (list, parent) => { for (const o of list) { out.push(dump(o, parent)); if (o.type === 'Container') walk(o.list, ids.get(o)); } };
       const roots = [...this.children.list].map((o, i) => [o, i]).sort((a, b) => a[0].depth - b[0].depth || a[1] - b[1]).map(p => p[0]);
       walk(roots, null);
-      resolve({ objects: out, warnings: built.warnings.length });
+      const done = () => resolve({ objects: out.map((r, i) => Object.assign(r, rebuild(i))), warnings: built.warnings.length });
+      const rebuild = () => ({});
+      const frames = c.frames || 0;
+      let n = 0;
+      if (!frames) done();
+      else this.events.on('update', () => { if (++n === frames) { out.length = 0; walk(roots, null); done(); } });
     }
   }
   const el = document.createElement('div'); document.body.append(el);

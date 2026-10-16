@@ -405,4 +405,6 @@ A conforming implementation must:
 4. Load a valid file and create the Phaser objects described, with the defaults, transforms and draw order specified here.
 5. Round-trip a file without losing core data.
 
+To claim conformance, run the [conformance suite](../conformance/README.md) and report which parts you pass: `validate` (items 1 and 2), `build` (release builds) and `load` (item 4, for Phaser-based loaders). Parts you do not implement are not claimed. Bitmap text, the other shapes' geometry details and pixel output are not covered yet.
+
 How well the core covers real Phaser scenes is measured in [SURVEY.md](SURVEY.md) and [ROUNDTRIP.md](ROUNDTRIP.md).

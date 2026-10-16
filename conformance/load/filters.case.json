@@ -1,0 +1,179 @@
+{
+ "description": "Internal and external filters are added in list order; active:false keeps the filter but switches it off. A mask can name any object in the scene as its source. An unknown filter type is skipped with a warning.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Filters",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "clip",
+    "type": "rectangle",
+    "width": 20,
+    "height": 20,
+    "fill": {
+     "color": "#ffffff"
+    }
+   },
+   {
+    "id": "img",
+    "type": "image",
+    "key": "box",
+    "filters": {
+     "internal": [
+      {
+       "type": "mask",
+       "source": "clip"
+      },
+      {
+       "type": "pixelate",
+       "amount": 4,
+       "active": false
+      }
+     ],
+     "external": [
+      {
+       "type": "blur",
+       "strength": 2
+      }
+     ]
+    }
+   },
+   {
+    "id": "weird",
+    "type": "image",
+    "key": "box",
+    "filters": {
+     "internal": [
+      {
+       "type": "sparkle"
+      },
+      {
+       "type": "threshold"
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "clip",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": {
+     "color": "#ffffff",
+     "alpha": 1
+    },
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "img",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "filters": {
+     "internal": [
+      {
+       "type": "mask",
+       "active": true
+      },
+      {
+       "type": "pixelate",
+       "active": false
+      }
+     ],
+     "external": [
+      {
+       "type": "blur",
+       "active": true
+      }
+     ]
+    },
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "weird",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "filters": {
+     "internal": [
+      {
+       "type": "threshold",
+       "active": true
+      }
+     ],
+     "external": []
+    },
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 1
+ }
+}

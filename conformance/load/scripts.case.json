@@ -1,0 +1,139 @@
+{
+ "description": "create runs once per script, in list order, after every object exists, with (object, scene, ctx). ctx has params and size. update runs each frame. A missing module is a warning.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "frames": 3,
+ "modules": {
+  "a.js": "return { create(o, scene, ctx) { o.setData('log', (o.getData('log') || '') + 'a'); o.setData('siblings', scene.children.list.length); o.setData('max', ctx.params.max === undefined ? null : ctx.params.max); o.setData('size', ctx.size ? ctx.size.width + 'x' + ctx.size.height : null); }, update(o) { o.setData('ticks', (o.getData('ticks') || 0) + 1); } };",
+  "b.js": "return { create(o) { o.setData('log', (o.getData('log') || '') + 'b'); } };"
+ },
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Scripts",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "bar",
+    "type": "graphics",
+    "scripts": [
+     "a.js",
+     "b.js",
+     "missing.js"
+    ],
+    "params": {
+     "max": 100
+    },
+    "placeholder": {
+     "kind": "rect",
+     "width": 200,
+     "height": 16,
+     "fill": "#ff0000"
+    }
+   },
+   {
+    "id": "plain",
+    "type": "graphics",
+    "scripts": [
+     "a.js"
+    ]
+   },
+   {
+    "id": "off",
+    "type": "graphics",
+    "scripts": [
+     "a.js"
+    ],
+    "active": false
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "bar",
+    "type": "Graphics",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1,
+    "data": {
+     "log": "ab",
+     "siblings": 3,
+     "max": 100,
+     "size": "200x16",
+     "ticks": 3
+    }
+   },
+   {
+    "id": "plain",
+    "type": "Graphics",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1,
+    "data": {
+     "log": "a",
+     "siblings": 3,
+     "max": null,
+     "size": null,
+     "ticks": 3
+    }
+   },
+   {
+    "id": "off",
+    "type": "Graphics",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": false,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1,
+    "data": {
+     "log": "a",
+     "siblings": 3,
+     "max": null,
+     "size": null
+    }
+   }
+  ],
+  "warnings": 1
+ }
+}
