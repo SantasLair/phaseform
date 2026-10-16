@@ -8,19 +8,19 @@ Tools (all in [verify/](../verify/)): `phaseform-serialize.js` (live scene to do
 
 | Status | Count |
 |---|---|
-| pixel-exact | 103 |
+| pixel-exact | 121 |
 | exact, with unsupported types present | 1 |
-| pixels differ | 63 |
+| pixels differ | 45 |
 | code-driven (contains a `Graphics` object; draw code is not recoverable, so not comparable) | 84 |
 | skipped (multi-scene, or scene not running) | 7 |
 | error (snapshot timeout) | 1 |
 | schema-invalid output | 0 |
 
-**Examples using only core types (111): 103 exact, 8 differ.** Every generated document was schema-valid. The core now includes the seven shapes, so 11 more examples count as core-only than before.
+**Examples using only core types (129): 121 exact, 8 differ.** Every generated document was schema-valid. The core now includes seven shapes and `bitmapText`, so 29 more examples count as core-only than in the first run.
 
-The other 148 contain a `Graphics` object (84 examples, reported as code-driven), an object type the core does not have (mostly `BitmapText` (41), `TileSprite` (14), and the shapes left out of v0.1: `grid`, `isobox`, `isotriangle`, `curve`), or could not be compared.
+The other 130 contain a `Graphics` object (84 examples, reported as code-driven), an object type the core does not have (mostly `TileSprite` (14), `DynamicBitmapText` (13), and the shapes left out of v0.1: `grid`, `isobox`, `isotriangle`, `curve`), or could not be compared.
 
-### The 8 core-only examples that differ
+### The 8 core-only examples that differ in this run
 
 | Example | Cause |
 |---|---|
@@ -29,9 +29,10 @@ The other 148 contain a `Graphics` object (84 examples, reported as code-driven)
 | text/line spacing, group/sprite pool | `lineSpacing` is not in the spec |
 | text/text gradient | text color is a `CanvasGradient`, not JSON |
 | text/word wrap by callback | `wordWrap.callback` is a function, not data |
-| container/non exclusive containers | **unexplained**, intermittent (see below) |
+| bitmaptext/tinted text | per-corner tint, not in the spec |
+| container/non exclusive containers | **unexplained**, intermittent: differed in some runs, exact in this one (see below) |
 
-The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, and 71 in later runs. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
+The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, 71, 62 and 71 in later runs, and exact in the latest. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
 
 ## What the round-trip changed in the spec
 
@@ -41,6 +42,7 @@ Bugs found by running real examples, all now fixed:
 3. **Style shape.** `style` must be Phaser's config form (nested `shadow` and `wordWrap`, `padding` inside), not the flat form that `toJSON()` produces.
 4. **Line width.** A WebGL line is drawn from its own start and end widths, so `setStrokeStyle` alone leaves it 1px wide. The loader now calls `setLineWidth`, and `stroke.endWidth` was added for tapered lines.
 5. **Arc iterations.** `iterations` changes how smoothly an arc is drawn and was added to `arc`.
+6. **Effective origin.** An example assigned `originX` directly, which changes the property but not the rendering. The serializer now reads the effective origin from the display origin (see VERIFICATION item 19).
 
 Confirmed gaps, not yet in the spec: `Graphics` commands, `BitmapText`, `TileSprite`, shapes, masks and filters, `lineSpacing`, gradient and callback text values, and sprite animations (43 benign occurrences).
 

@@ -59,19 +59,21 @@ Core types:
 | `image` | `load.image` | `url` |
 | `spritesheet` | `load.spritesheet` | `url`, `frameWidth`, `frameHeight`, optional `startFrame`, `endFrame`, `margin`, `spacing`, `frames` |
 | `atlas` | `load.atlas` | `url` (texture), `atlasUrl` (JSON frame data) |
+| `bitmapFont` | `load.bitmapFont` | `url` (font image), `dataUrl` (font data, XML) |
 | `audio` | `load.audio` | `urls` (list of alternative files) |
 
 `frames` on a spritesheet is an optional frame count. Without it, a tool cannot know the sheet's size from the manifest and can only check that a frame index is a non-negative integer. For atlases, a tool that can read the atlas JSON may validate frame names.
 
-Anything else (bitmap fonts, tilemaps, video, scripts) is an unknown type in v0.1: it is preserved but not defined.
+Anything else (tilemaps, video, scripts) is an unknown type in v0.1: it is preserved but not defined.
 
 ## Rules
 
-- **Key uniqueness.** Image, spritesheet and atlas keys share Phaser's texture namespace and must be unique among themselves. Audio keys are unique among audio. Different namespaces may reuse a key.
+- **Key uniqueness.** Image, spritesheet, atlas and bitmapFont keys share Phaser's texture namespace (a bitmap font's image is added to the texture manager under the font's key) and must be unique among themselves. Audio keys are unique among audio. Different namespaces may reuse a key.
 - **Scene keys** are unique within `scenes`.
 - **`entry`** must be one of the scene keys.
 - **Per-scene `assets`** must name keys that exist in the manifest.
 - **Texture references.** Every `key` used by an `image` or `sprite` object in a scene should be a texture asset in the manifest. A missing one is a **warning**, not an error: Phaser would draw its placeholder texture, but a project may load some assets by other means.
+- **Font references.** The `font` of a `bitmapText` object should be a `bitmapFont` asset in the manifest. A missing one is a **warning**, as for textures.
 - **Frames.** A scene object's `frame` should exist in its texture. Phaser does not fail on a missing frame; it warns and silently falls back to the default, so loaders must check. Where the manifest cannot say (no `frames` count, atlas not readable), skip the check.
 - **Scene sizes.** All scenes in a project should have the same `size`. A loader warns when they differ.
 - **Scene file validity.** Every scene file must itself be valid against the scene schema.

@@ -9,6 +9,7 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Scope](#scope)
 - [Scene document](#scene-document)
 - [Objects](#objects)
+- [Bitmap text](#bitmap-text)
 - [Shapes](#shapes)
 - [Scripts and code-driven objects](#scripts-and-code-driven-objects)
 - [Conventions](#conventions)
@@ -98,6 +99,7 @@ On a container, `scrollFactor` affects the container only, not its children.
 | `text` | `Text` | `text`, `style`, `origin`, `scale`, `rotation`, `tint`, `tintMode`, `blendMode` |
 | `container` | `Container` | `children`, `scale`, `rotation`, `blendMode` |
 | `rectangle`, `ellipse`, `triangle`, `line`, `polygon`, `star`, `arc` | the Phaser shape of the same name | [shapes](#shapes) |
+| `bitmapText` | `BitmapText` | [bitmap text](#bitmap-text) |
 | `graphics` | `Graphics` | none. Code-driven, see [Scripts](#scripts-and-code-driven-objects) |
 
 Fields not listed for a type are invalid on that type. Containers have no `origin`, `flipX`, `flipY`, `tint` or size: Phaser fixes a container's origin, gives it zero intrinsic size, and gives it no tint or flip.
@@ -131,6 +133,23 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 - **`blendMode`.** The four values are the modes WebGL renders natively. Other Phaser modes may render incorrectly in WebGL (`difference` was observed falling back to `normal`), so they are not in the core. Phaser silently treats an unknown name as `normal`, so loaders must reject unknown values themselves. A container has no blend mode of its own by default, so its children keep theirs. Writing `blendMode` on a container sets one explicitly.
 - **`style`.** Phaser's text style config object, passed through unchanged: shadow is nested as `shadow: { offsetX, ... }`, word wrap as `wordWrap: { width, useAdvancedWrap }`, and `padding` goes inside `style`. Phaser's defaults are Courier, 16px, white. A numeric `fontSize` becomes pixels. If `metrics` (`ascent`, `descent`, `fontSize`) is given, Phaser uses it instead of measuring, which changes text height, so it must be preserved.
 - **vec2.** `{ "x": number, "y": number }`.
+
+### Bitmap text
+
+`bitmapText` draws text from a bitmap font loaded as a `bitmapFont` asset ([PROJECT.md](PROJECT.md)). It has the common fields plus `origin` (default `{0, 0}`), `scale`, `rotation`, `tint`, `tintMode` and `blendMode`. It has no `flipX` or `flipY` and cannot have children.
+
+| Field | Required | Default | Description |
+|---|---|---|---|
+| `font` | yes | | Key of a `bitmapFont` asset. |
+| `text` | yes | | The text. `\n` starts a new line. |
+| `size` | no | the font data's size | Font size in pixels. |
+| `align` | no | `left` | `left`, `center` or `right`. Aligns lines within the text block. |
+| `letterSpacing` | no | `0` | Extra pixels between characters. |
+| `lineSpacing` | no | `0` | Extra pixels between lines. |
+| `maxWidth` | no | `0` | Wrap width in pixels. `0` means no wrapping. |
+| `dropShadow` | no | none | `x`, `y` (required), `color` (default `#000000`), `alpha` (default 0.5). Phaser draws it only when `x` or `y` is not 0. |
+
+Per-character and per-word tints (`charColors`), atlas-based fonts and `DynamicBitmapText` are not in v0.1.
 
 ### Shapes
 

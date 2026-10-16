@@ -96,6 +96,16 @@
           }
         },
         {
+          "if": { "properties": { "type": { "const": "bitmapFont" } }, "required": ["type"] },
+          "then": {
+            "required": ["url", "dataUrl"],
+            "properties": {
+              "url": { "$ref": "#/$defs/path" },
+              "dataUrl": { "$ref": "#/$defs/path" }
+            }
+          }
+        },
+        {
           "if": { "properties": { "type": { "const": "audio" } }, "required": ["type"] },
           "then": {
             "required": ["urls"],

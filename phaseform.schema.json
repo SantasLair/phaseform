@@ -140,7 +140,8 @@
         "tintMode": { "$ref": "#/$defs/tintMode" },
         "blendMode": { "$ref": "#/$defs/blendMode" },
         "fill": { "$ref": "#/$defs/fill" },
-        "stroke": { "$ref": "#/$defs/stroke" }
+        "stroke": { "$ref": "#/$defs/stroke" },
+        "dropShadow": { "$ref": "#/$defs/dropShadow" }
       },
       "additionalProperties": true,
       "allOf": [
@@ -168,6 +169,15 @@
         {
           "if": { "properties": { "type": { "enum": ["rectangle", "ellipse", "triangle", "line", "polygon", "star", "arc"] } }, "required": ["type"] },
           "then": { "$ref": "#/$defs/shape" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "bitmapText" } }, "required": ["type"] },
+          "then": {
+            "allOf": [
+              { "$ref": "#/$defs/bitmapText" },
+              { "not": { "anyOf": [{ "required": ["flipX"] }, { "required": ["flipY"] }, { "required": ["children"] }] } }
+            ]
+          }
         },
         { "if": { "properties": { "type": { "const": "rectangle" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/rectangle" } },
         { "if": { "properties": { "type": { "const": "ellipse" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/ellipse" } },
@@ -210,6 +220,33 @@
       },
       "additionalProperties": true,
       "description": "Shape outline. Absent means not stroked. Valid on shapes only."
+    },
+
+    "dropShadow": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "color": { "$ref": "#/$defs/color", "description": "Default #000000." },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.5 }
+      },
+      "additionalProperties": true,
+      "description": "Bitmap text shadow. Phaser draws it only when x or y is not 0."
+    },
+
+    "bitmapText": {
+      "type": "object",
+      "required": ["font", "text"],
+      "properties": {
+        "font": { "type": "string", "minLength": 1, "description": "Key of a bitmapFont asset." },
+        "text": { "type": "string" },
+        "size": { "type": "number", "exclusiveMinimum": 0, "description": "Font size in pixels. Defaults to the size stored in the font data." },
+        "align": { "enum": ["left", "center", "right"], "default": "left" },
+        "letterSpacing": { "type": "number", "default": 0 },
+        "lineSpacing": { "type": "number", "default": 0 },
+        "maxWidth": { "type": "number", "minimum": 0, "default": 0, "description": "Wrap width in pixels. 0 means no wrapping." }
+      }
     },
 
     "shape": {

@@ -1,0 +1,42 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "BitmapText",
+  "size": {
+    "width": 800,
+    "height": 600
+  },
+  "background": "#0d0d0d",
+  "objects": [
+    {
+      "id": "title",
+      "type": "bitmapText",
+      "font": "pixel-font",
+      "text": "GAME OVER",
+      "x": 400,
+      "y": 120,
+      "size": 48,
+      "align": "center",
+      "origin": {
+        "x": 0.5,
+        "y": 0
+      },
+      "tint": "#ffcc00",
+      "dropShadow": {
+        "x": 2,
+        "y": 2
+      }
+    },
+    {
+      "id": "body",
+      "type": "bitmapText",
+      "font": "pixel-font",
+      "text": "Press any key to continue the quest again and again",
+      "x": 100,
+      "y": 300,
+      "maxWidth": 300,
+      "letterSpacing": 2,
+      "lineSpacing": 4
+    }
+  ]
+}

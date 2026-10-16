@@ -23,6 +23,7 @@
     { "key": "spark", "type": "image", "url": "assets/spark.png" },
     { "key": "sky", "type": "image", "url": "assets/sky.png" },
     { "key": "heart", "type": "image", "url": "assets/heart.png" },
+    { "key": "pixel-font", "type": "bitmapFont", "url": "assets/pixel-font.png", "dataUrl": "assets/pixel-font.xml" },
     { "key": "jump", "type": "audio", "urls": ["assets/jump.ogg", "assets/jump.mp3"] }
   ]
 }

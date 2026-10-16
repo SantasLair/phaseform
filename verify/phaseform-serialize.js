@@ -3,12 +3,23 @@
 // report.lossy / report.unsupported instead of being dropped silently.
 window.PhaseformSerializer = (function () {
   const BLEND = { 0: 'normal', 1: 'add', 2: 'multiply', 3: 'screen' };
-  const TYPES = { Image: 'image', Sprite: 'sprite', Text: 'text', Container: 'container', Graphics: 'graphics',
+  const TYPES = { Image: 'image', Sprite: 'sprite', Text: 'text', Container: 'container', Graphics: 'graphics', BitmapText: 'bitmapText',
     Rectangle: 'rectangle', Ellipse: 'ellipse', Triangle: 'triangle', Line: 'line', Polygon: 'polygon', Star: 'star', Arc: 'arc' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
   const SHADOW = { shadowOffsetX: 'offsetX', shadowOffsetY: 'offsetY', shadowColor: 'color', shadowBlur: 'blur', shadowStroke: 'stroke', shadowFill: 'fill' };
   const hex = (n) => '#' + (n & 0xffffff).toString(16).padStart(6, '0');
   const isPlain = (v) => v === null || typeof v !== 'object' || Array.isArray(v) || Object.getPrototypeOf(v) === Object.prototype;
+
+  // Phaser renders from a cached display origin that only setOrigin() updates. Assigning originX/originY directly
+  // changes the property but not the rendering, so the effective origin is read back from the display origin.
+  // BitmapText recomputes its own display origin from its text bounds, so it is read as is.
+  function effectiveOrigin(o) {
+    let x = o.originX, y = o.originY;
+    if (o.type === 'BitmapText') return { x, y };
+    if (o.width && Math.abs(o.displayOriginX - x * o.width) > 1e-6) x = o.displayOriginX / o.width;
+    if (o.height && Math.abs(o.displayOriginY - y * o.height) > 1e-6) y = o.displayOriginY / o.height;
+    return { x, y };
+  }
 
   function tintModeName(mode) {
     for (const [k, v] of Object.entries(Phaser.TintModes)) if (v === mode) return k === 'MULTIPLY_TWO' ? null : k.toLowerCase().replace('_', '-');
@@ -81,7 +92,8 @@ window.PhaseformSerializer = (function () {
       if (o.scaleX !== 1 || o.scaleY !== 1) out.scale = { x: o.scaleX, y: o.scaleY };
 
       if (SHAPES.has(type)) {
-        if (o.originX !== 0.5 || o.originY !== 0.5) out.origin = { x: o.originX, y: o.originY };
+        const org = effectiveOrigin(o);
+        if (org.x !== 0.5 || org.y !== 0.5) out.origin = org;
         if (o.isFilled) { out.fill = { color: hex(o.fillColor) }; if (o.fillAlpha !== 1) out.fill.alpha = o.fillAlpha; }
         if (o.isStroked) { out.stroke = { color: hex(o.strokeColor) }; const w = type === 'line' ? o._startWidth : o.lineWidth;
           if (w !== 1) out.stroke.width = w;
@@ -90,8 +102,9 @@ window.PhaseformSerializer = (function () {
         if (o.lightingActive) report.lossy.push({ id, field: 'lighting', why: 'not in spec' });
       }
       if (type !== 'container' && type !== 'graphics' && !SHAPES.has(type)) {
-        const dflt = type === 'text' ? 0 : 0.5;
-        if (o.originX !== dflt || o.originY !== dflt) out.origin = { x: o.originX, y: o.originY };
+        const dflt = type === 'text' || type === 'bitmapText' ? 0 : 0.5;
+        const org = effectiveOrigin(o);
+        if (org.x !== dflt || org.y !== dflt) out.origin = org;
         if (o.isTinted) {
           const t = o.tintTopLeft;
           if (o.tintTopRight === t && o.tintBottomLeft === t && o.tintBottomRight === t) out.tint = hex(t);
@@ -117,6 +130,21 @@ window.PhaseformSerializer = (function () {
         const style = textStyle(o, id);
         if (Object.keys(style).length) out.style = style;
         if (o.lineSpacing) report.lossy.push({ id, field: 'lineSpacing', why: 'not in spec' });
+      } else if (type === 'bitmapText') {
+        out.font = o.font;
+        out.text = o.text;
+        if (o._fontSize !== o.fontData.size) out.size = o._fontSize;
+        if (o.align) out.align = ['left', 'center', 'right'][o.align];
+        if (o.letterSpacing) out.letterSpacing = o.letterSpacing;
+        if (o.lineSpacing) out.lineSpacing = o.lineSpacing;
+        if (o.maxWidth) out.maxWidth = o.maxWidth;
+        if (o.dropShadowX || o.dropShadowY) {
+          out.dropShadow = { x: o.dropShadowX, y: o.dropShadowY };
+          if (o.dropShadowColor !== 0) out.dropShadow.color = hex(o.dropShadowColor);
+          if (o.dropShadowAlpha !== 0.5) out.dropShadow.alpha = o.dropShadowAlpha;
+        }
+        if (o.charColors && o.charColors.length) report.lossy.push({ id, field: 'charColors', why: 'per-character tint not in spec' });
+        if (o.wordWrapCharCode !== 32) report.lossy.push({ id, field: 'wordWrapCharCode', why: 'not in spec' });
       } else if (type === 'rectangle') {
         out.width = o.geom.width; out.height = o.geom.height;
       } else if (type === 'ellipse') {

@@ -4,6 +4,7 @@
 window.PhaseformLoader = (function () {
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
+  const ALIGN = { left: 0, center: 1, right: 2 };
   const flat = (pts) => pts.flatMap(p => [p.x, p.y]);
   const TINT = { multiply: 'MULTIPLY', fill: 'FILL', add: 'ADD', screen: 'SCREEN', overlay: 'OVERLAY', 'hard-light': 'HARD_LIGHT' };
 
@@ -40,6 +41,15 @@ window.PhaseformLoader = (function () {
         case 'graphics':
           o = scene.add.graphics({ x, y });
           break;
+        case 'bitmapText': {
+          if (!scene.cache.bitmapFont.exists(d.font)) throw new Error(`${d.id}: bitmap font "${d.font}" not loaded`);
+          o = scene.add.bitmapText(x, y, d.font, d.text, d.size, ALIGN[d.align || 'left']);
+          if (d.letterSpacing) o.setLetterSpacing(d.letterSpacing);
+          if (d.lineSpacing) o.setLineSpacing(d.lineSpacing);
+          if (d.maxWidth) o.setMaxWidth(d.maxWidth);
+          if (d.dropShadow) o.setDropShadow(d.dropShadow.x, d.dropShadow.y, d.dropShadow.color === undefined ? 0 : parseInt(d.dropShadow.color.slice(1), 16), d.dropShadow.alpha === undefined ? 0.5 : d.dropShadow.alpha);
+          break;
+        }
         case 'rectangle':
           o = scene.add.rectangle(x, y, d.width, d.height);
           break;

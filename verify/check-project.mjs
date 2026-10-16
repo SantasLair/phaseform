@@ -2,7 +2,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
-const TEXTURE_TYPES = new Set(['image', 'spritesheet', 'atlas']);
+const TEXTURE_TYPES = new Set(['image', 'spritesheet', 'atlas', 'bitmapFont']); // a bitmap font's image is added to the texture manager under its key
+const IMAGE_REF_TYPES = new Set(['image', 'spritesheet', 'atlas']);
 
 function* walk(objects) {
   for (const o of objects ?? []) {
@@ -49,9 +50,15 @@ export function checkProject(projectPath) {
 
     // texture references and frames (warnings)
     for (const o of walk(scene.objects)) {
+      if (o.type === 'bitmapText') {
+        const f = textures.get(o.font);
+        if (!f || f.type !== 'bitmapFont') warnings.push(`scene "${entry.key}": object "${o.id}" uses font "${o.font}" not a bitmapFont in the manifest`);
+        else if (entry.assets && !entry.assets.includes(o.font)) warnings.push(`scene "${entry.key}": object "${o.id}" uses font "${o.font}" not in the scene's asset list`);
+        continue;
+      }
       if (o.type !== 'image' && o.type !== 'sprite') continue;
       const tex = textures.get(o.key);
-      if (!tex) { warnings.push(`scene "${entry.key}": object "${o.id}" uses texture "${o.key}" not in the manifest`); continue; }
+      if (!tex || !IMAGE_REF_TYPES.has(tex.type)) { warnings.push(`scene "${entry.key}": object "${o.id}" uses texture "${o.key}" not in the manifest`); continue; }
       if (entry.assets && !entry.assets.includes(o.key)) {
         warnings.push(`scene "${entry.key}": object "${o.id}" uses texture "${o.key}" not in the scene's asset list`);
       }
