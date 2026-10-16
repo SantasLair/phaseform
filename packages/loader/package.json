@@ -1,0 +1,11 @@
+{
+  "name": "phaseform-loader",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Builds PHASEFORM scene documents into objects in a Phaser 4 scene (unpublished reference loader)",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js", "./factory": "./src/loader.js" },
+  "peerDependencies": { "phaser": "^4.2.1" },
+  "license": "MIT"
+}

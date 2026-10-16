@@ -2,7 +2,9 @@
 // Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order, script hooks.
 // build(scene, doc, { modules, animations }) takes modules as { 'scripts/x.js': { create, update } } and the project's
 // animation definitions, which are created in the game's animation manager if missing. The placeholder is ignored.
+// Phaser is passed in so the module has no import of its own; src/index.js binds it to the installed phaser package.
 window.PhaseformLoader = (function () {
+  const Phaser = window.Phaser;
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
   const ALIGN = { left: 0, center: 1, right: 2 };
