@@ -1,0 +1,157 @@
+{
+ "description": "Explicit common fields are applied: position, scale, rotation, alpha, origin, flips, tint, blend mode, visibility, scroll factor, name, data.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "CoreFields",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "a",
+    "type": "image",
+    "key": "box",
+    "name": "first",
+    "x": 100,
+    "y": 50,
+    "scale": {
+     "x": 2,
+     "y": 3
+    },
+    "rotation": 0.5,
+    "alpha": 0.25,
+    "origin": {
+     "x": 0,
+     "y": 1
+    },
+    "flipX": true,
+    "flipY": true,
+    "tint": "#ff8800",
+    "tintMode": "fill",
+    "blendMode": "add",
+    "scrollFactor": {
+     "x": 0.5,
+     "y": 0.25
+    },
+    "data": {
+     "hp": 3
+    }
+   },
+   {
+    "id": "b",
+    "type": "image",
+    "key": "box",
+    "visible": false,
+    "active": false,
+    "blendMode": "multiply"
+   },
+   {
+    "id": "c",
+    "type": "text",
+    "text": "x",
+    "origin": {
+     "x": 0.5,
+     "y": 0.5
+    },
+    "blendMode": "screen",
+    "tint": "#00ff00"
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "a",
+    "type": "Image",
+    "parent": null,
+    "x": 100,
+    "y": 50,
+    "scaleX": 2,
+    "scaleY": 3,
+    "rotation": 0.5,
+    "alpha": 0.25,
+    "visible": true,
+    "active": true,
+    "originX": 0,
+    "originY": 1,
+    "flipX": true,
+    "flipY": true,
+    "tint": "#ff8800",
+    "tintMode": "fill",
+    "texture": "box",
+    "frame": "__BASE",
+    "blendMode": "add",
+    "scrollFactorX": 0.5,
+    "scrollFactorY": 0.25,
+    "name": "first",
+    "data": {
+     "hp": 3
+    }
+   },
+   {
+    "id": "b",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": false,
+    "active": false,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "blendMode": "multiply",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "c",
+    "type": "Text",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": "#00ff00",
+    "tintMode": "multiply",
+    "text": "x",
+    "blendMode": "screen",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 0
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "description": "An unknown object type is skipped with a warning; the rest of the scene loads.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "UnknownType",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "future",
+    "type": "hologram"
+   },
+   {
+    "id": "ok",
+    "type": "rectangle",
+    "width": 4,
+    "height": 4
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "ok",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 1
+ }
+}

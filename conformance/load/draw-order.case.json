@@ -1,0 +1,224 @@
+{
+ "description": "Array order is draw order, in the scene and inside containers. A root object may set depth. Children use local coordinates.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "DrawOrder",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "back",
+    "type": "rectangle",
+    "width": 4,
+    "height": 4
+   },
+   {
+    "id": "group",
+    "type": "container",
+    "x": 100,
+    "y": 100,
+    "scale": {
+     "x": 2,
+     "y": 2
+    },
+    "alpha": 0.5,
+    "children": [
+     {
+      "id": "g1",
+      "type": "image",
+      "key": "box",
+      "x": 10,
+      "y": 10
+     },
+     {
+      "id": "g2",
+      "type": "rectangle",
+      "width": 4,
+      "height": 4,
+      "x": -5
+     },
+     {
+      "id": "inner",
+      "type": "container",
+      "x": 1,
+      "y": 2,
+      "children": [
+       {
+        "id": "deep",
+        "type": "text",
+        "text": "d"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "front",
+    "type": "rectangle",
+    "width": 4,
+    "height": 4
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "back",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "group",
+    "type": "Container",
+    "parent": null,
+    "x": 100,
+    "y": 100,
+    "scaleX": 2,
+    "scaleY": 2,
+    "rotation": 0,
+    "alpha": 0.5,
+    "visible": true,
+    "active": true,
+    "blendMode": null,
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "g1",
+    "type": "Image",
+    "parent": "group",
+    "x": 10,
+    "y": 10,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "g2",
+    "type": "Rectangle",
+    "parent": "group",
+    "x": -5,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "inner",
+    "type": "Container",
+    "parent": "group",
+    "x": 1,
+    "y": 2,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": null,
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "deep",
+    "type": "Text",
+    "parent": "inner",
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0,
+    "originY": 0,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "text": "d",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "front",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 0
+ }
+}

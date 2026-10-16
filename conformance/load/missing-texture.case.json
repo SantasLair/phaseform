@@ -1,0 +1,91 @@
+{
+ "description": "A texture that is not loaded produces a warning and the object is still created.",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "MissingTexture",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "ghost",
+    "type": "image",
+    "key": "nope"
+   },
+   {
+    "id": "ok",
+    "type": "image",
+    "key": "box"
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "ghost",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "__MISSING",
+    "frame": "__BASE",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "ok",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 1
+ }
+}

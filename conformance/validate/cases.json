@@ -1,0 +1,332 @@
+[
+ {
+  "kind": "scene",
+  "file": "examples/01-empty.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/02-text.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/03-sprites-and-hud.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/04-extensions.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/05-core-fields.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/06-code-driven.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/07-shapes.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/08-bitmap-text.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/09-tile-sprite.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/10-filters.phaseform.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/alpha-out-of-range.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/animation-missing-key.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/animation-negative-start.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/animation-on-image.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/arc-missing-radius.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/bad-blend-mode.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/bitmaptext-bad-align.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/bitmaptext-flip.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/bitmaptext-missing-font.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/children-on-image.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/container-origin.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/container-tint.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/duplicate-id.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/fill-bad-color.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-bad-blend-mode.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-bad-color.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-bad-wipe-direction.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-list-not-array.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-mask-ancestor.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-mask-missing-source.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-mask-self.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-mask-source-and-texture.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-missing-type.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-parallel-bad-child.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-threshold-three-channels.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/filter-vignette-shader-blend-mode.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/image-missing-key.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/line-with-fill.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/line-without-stroke.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/params-not-object.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/placeholder-bad-kind.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/placeholder-image-no-path.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/placeholder-missing-size.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/placeholder-polygon-no-points.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/polygon-two-points.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/rectangle-missing-size.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/shape-flip.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/shape-tint.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/star-missing-radius.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/text-flip.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/tilesprite-missing-key.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/tilesprite-missing-size.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/tilesprite-zero-size.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "scene",
+  "file": "examples/invalid/triangle-two-points.phaseform.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/phaseform.project.json",
+  "expect": "valid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/animation-no-frames.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/backslash-path.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/bitmapfont-no-data.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/duplicate-animation-key.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/duplicate-texture-key.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/entry-not-in-scenes.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/no-scenes.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/path-traversal.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/scene-key-mismatch.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/spritesheet-no-frame-size.project.json",
+  "expect": "invalid"
+ },
+ {
+  "kind": "project",
+  "file": "examples/invalid-project/unknown-scene-asset.project.json",
+  "expect": "invalid"
+ }
+]

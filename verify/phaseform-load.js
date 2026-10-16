@@ -285,7 +285,7 @@ window.PhaseformLoader = (function () {
       scene.events.on('update', onUpdate);
       scene.events.once('shutdown', () => scene.events.off('update', onUpdate));
     }
-    return { objects: roots, warnings };
+    return { objects: roots, warnings, byId };
   }
 
   // Queues the loader calls for a project's assets (or only `keys`, a scene entry's asset list). Call from preload().

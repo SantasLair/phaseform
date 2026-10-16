@@ -22,7 +22,8 @@ function* walk(objects) {
 }
 
 // Returns { errors, warnings, project, scenes: [{ entry, doc }] }. Script paths that do not resolve to a file are errors.
-export function validateProject(projectPath) {
+// Pass { checkScripts: false } to skip the script-file check (the conformance suite has no script files).
+export function validateProject(projectPath, { checkScripts = true } = {}) {
   const errors = [];
   const root = dirname(projectPath);
   let project;
@@ -42,7 +43,7 @@ export function validateProject(projectPath) {
     }
     errors.push(...checkScene(doc).errors.map(m => `${entry.path}: ${m}`));
     for (const o of walk(doc.objects)) {
-      for (const s of o.scripts ?? []) {
+      for (const s of checkScripts ? o.scripts ?? [] : []) {
         if (!existsSync(join(root, s))) errors.push(`${entry.path}: object "${o.id}" script not found: ${s}`);
       }
     }
@@ -50,6 +51,12 @@ export function validateProject(projectPath) {
   const p = checkProject(projectPath);
   errors.push(...p.errors);
   return { errors, warnings: p.warnings, project, scenes };
+}
+
+// Schema and scene rules for one scene document. Returns the list of errors.
+export function validateSceneDocument(doc) {
+  if (!validateSceneSchema(doc)) return validateSceneSchema.errors.map(e => `${e.instancePath}: ${e.message}`);
+  return checkScene(doc).errors;
 }
 
 export function scriptPaths(scenes) {

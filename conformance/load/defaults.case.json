@@ -1,0 +1,156 @@
+{
+ "description": "Objects with only required fields get the spec defaults (origin, scale, alpha, tint, blend mode).",
+ "textures": [
+  {
+   "key": "box",
+   "width": 32,
+   "height": 32
+  },
+  {
+   "key": "sheet",
+   "width": 64,
+   "height": 32,
+   "frameWidth": 32,
+   "frameHeight": 32
+  }
+ ],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Defaults",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "img",
+    "type": "image",
+    "key": "box"
+   },
+   {
+    "id": "txt",
+    "type": "text",
+    "text": "hi"
+   },
+   {
+    "id": "rect",
+    "type": "rectangle",
+    "width": 10,
+    "height": 10
+   },
+   {
+    "id": "box",
+    "type": "container"
+   },
+   {
+    "id": "gfx",
+    "type": "graphics"
+   }
+  ]
+ },
+ "expect": {
+  "objects": [
+   {
+    "id": "img",
+    "type": "Image",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "texture": "box",
+    "frame": "__BASE",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "txt",
+    "type": "Text",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0,
+    "originY": 0,
+    "flipX": false,
+    "flipY": false,
+    "tint": null,
+    "tintMode": "multiply",
+    "text": "hi",
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "rect",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "box",
+    "type": "Container",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": null,
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "gfx",
+    "type": "Graphics",
+    "parent": null,
+    "x": 0,
+    "y": 0,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 0
+ }
+}

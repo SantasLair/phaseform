@@ -1,0 +1,8 @@
+{
+  "format": "phaseform-project",
+  "version": "0.1.0",
+  "name": "Fixture",
+  "entry": "Main",
+  "scenes": [{ "key": "Main", "path": "scenes/main.phaseform.json" }],
+  "assets": [{ "key": "hero", "type": "image", "url": "assets/hero.png" }]
+}

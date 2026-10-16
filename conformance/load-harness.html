@@ -1,0 +1,55 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform conformance: load</title>
+<script src="../verify/node_modules/phaser/dist/phaser.min.js"></script>
+<script src="../verify/phaseform-load.js"></script>
+<script>
+// Loads one case and dumps the resulting objects in the format described in conformance/README.md.
+window.runCase = (c) => new Promise((resolve) => {
+  const BLEND = { 0: 'normal', 1: 'add', 2: 'multiply', 3: 'screen' };
+  const TINTMODE = Object.fromEntries(Object.entries(Phaser.TintModes).map(([k, v]) => [v, k.toLowerCase().replace(/_/g, '-')]));
+  const hex = (n) => '#' + n.toString(16).padStart(6, '0');
+  const round = (n) => Math.round(n * 1e6) / 1e6;
+  const mod2pi = (r) => round(((r % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI));
+  class S extends Phaser.Scene {
+    constructor() { super('S'); }
+    create() {
+      for (const t of c.textures || []) {
+        if (t.frameWidth) {
+          const ct = this.textures.createCanvas(t.key, t.width, t.height);
+          const tex = ct;
+          for (let i = 0; i * t.frameWidth < t.width; i++) tex.add(i, 0, i * t.frameWidth, 0, t.frameWidth, t.frameHeight);
+        } else this.textures.createCanvas(t.key, t.width, t.height);
+      }
+      const built = PhaseformLoader.build(this, c.scene, {});
+      const ids = new Map([...built.byId].map(([id, o]) => [o, id]));
+      const dump = (o, parent) => {
+        const isShape = o.isFilled !== undefined;
+        const r = { id: ids.get(o), type: c.scene && null, parent };
+        r.type = o.type;
+        r.x = o.x; r.y = o.y; r.scaleX = o.scaleX; r.scaleY = o.scaleY; r.rotation = mod2pi(o.rotation); r.alpha = o.alpha;
+        r.visible = o.visible; r.active = o.active;
+        if (o.type !== 'Container' && o.type !== 'Graphics') { r.originX = o.originX; r.originY = o.originY; }
+        if (o.type === 'Image' || o.type === 'Sprite' || o.type === 'Text') { r.flipX = o.flipX; r.flipY = o.flipY; r.tint = o.isTinted ? hex(o.tintTopLeft) : null; r.tintMode = TINTMODE[o.tintMode]; }
+        if (o.type === 'Image' || o.type === 'Sprite') { r.texture = o.texture.key; r.frame = o.frame.name; }
+        if (o.type === 'Text') r.text = o.text;
+        if (isShape) { r.fill = o.isFilled ? { color: hex(o.fillColor), alpha: o.fillAlpha } : null; r.stroke = o.isStroked ? { width: o.lineWidth, color: hex(o.strokeColor), alpha: o.strokeAlpha } : null; }
+        r.blendMode = o.blendMode === -1 ? null : BLEND[o.blendMode] ?? o.blendMode; // containers inherit: null
+        r.scrollFactorX = o.scrollFactorX; r.scrollFactorY = o.scrollFactorY;
+        if (o.name) r.name = o.name;
+        const data = o.getData('phaseform') && Object.keys(o.data.getAll()).filter(k => k !== 'phaseform');
+        if (data && data.length) r.data = Object.fromEntries(data.map(k => [k, o.getData(k)]));
+        return r;
+      };
+      const out = [];
+      const walk = (list, parent) => { for (const o of list) { out.push(dump(o, parent)); if (o.type === 'Container') walk(o.list, ids.get(o)); } };
+      const roots = [...this.children.list].map((o, i) => [o, i]).sort((a, b) => a[0].depth - b[0].depth || a[1] - b[1]).map(p => p[0]);
+      walk(roots, null);
+      resolve({ objects: out, warnings: built.warnings.length });
+    }
+  }
+  const el = document.createElement('div'); document.body.append(el);
+  const game = new Phaser.Game({ type: Phaser.WEBGL, parent: el, width: 400, height: 300, scene: S, audio: { noAudio: true } });
+  window.__game = game;
+});
+</script>
