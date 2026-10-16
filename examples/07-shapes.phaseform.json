@@ -1,0 +1,28 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Shapes",
+  "size": { "width": 800, "height": 600 },
+  "background": "#0d0d0d",
+  "objects": [
+    { "id": "panel", "type": "rectangle", "x": 400, "y": 300, "width": 300, "height": 120,
+      "fill": { "color": "#223355", "alpha": 0.8 }, "stroke": { "color": "#ffffff", "width": 4 } },
+    { "id": "hit-area", "type": "rectangle", "x": 100, "y": 100, "width": 64, "height": 64, "origin": { "x": 0, "y": 0 } },
+    { "id": "ball", "type": "ellipse", "x": 200, "y": 200, "width": 80, "height": 60, "smoothness": 32, "fill": { "color": "#ff6600" } },
+    { "id": "roof", "type": "triangle", "x": 600, "y": 120,
+      "points": [{ "x": 0, "y": 80 }, { "x": 80, "y": 80 }, { "x": 40, "y": 0 }], "fill": { "color": "#cc3333" } },
+    { "id": "rope", "type": "line", "x": 50, "y": 500,
+      "points": [{ "x": 0, "y": 0 }, { "x": 200, "y": 40 }], "stroke": { "color": "#cccccc", "width": 3 } },
+    { "id": "arrow", "type": "polygon", "x": 500, "y": 450,
+      "points": [{ "x": 0, "y": 10 }, { "x": 40, "y": 10 }, { "x": 40, "y": 0 }, { "x": 60, "y": 20 }, { "x": 40, "y": 40 }, { "x": 40, "y": 30 }, { "x": 0, "y": 30 }],
+      "fill": { "color": "#ffcc00" }, "rotation": 0.5 },
+    { "id": "badge", "type": "star", "x": 700, "y": 500, "pointCount": 6, "innerRadius": 15, "outerRadius": 35,
+      "fill": { "color": "#ffee33" }, "stroke": { "color": "#aa8800" }, "blendMode": "add" },
+    { "id": "gauge", "type": "arc", "x": 150, "y": 400, "radius": 60, "startAngle": 0, "endAngle": 270, "anticlockwise": false,
+      "stroke": { "color": "#33cc66", "width": 8 } },
+    { "id": "group", "type": "container", "x": 300, "y": 520, "children": [
+      { "id": "group-bg", "type": "rectangle", "width": 100, "height": 40, "fill": { "color": "#444444" } },
+      { "id": "group-dot", "type": "ellipse", "width": 20, "height": 20, "fill": { "color": "#ffffff" } }
+    ] }
+  ]
+}

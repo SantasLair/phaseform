@@ -17,7 +17,7 @@ How much of Phaser's official example set the PHASEFORM v0.1 core can describe.
 |---|---|---|
 | static | 52 | Core types only, no behavior. Convertible with the v0.1 core today. |
 | behavior | 46 | Core types only, plus tweens, input, update loops, etc. The scene converts; the behavior stays as code. |
-| graphics | 75 | Uses `Graphics`, which is reserved in v0.1 (commands undefined). Blocked on the graphics commands design. |
+| graphics | 75 | Uses `Graphics`. Draw commands are not in the spec: `graphics` is now a code-driven host, so these examples describe code, not scene data. |
 | missing type | 77 | Contains an object type that is not in the core. |
 | filters | 2 | Uses filters or lighting, out of scope for v0.1. |
 | failed to run | 7 | 4 need external libraries (`dat.GUI`, `TimelineMax`), 3 fail for other reasons (`obj world cam` is in a `_wip` folder, `mouse trail` and `stacker es6` hit DOM or runtime errors). |
@@ -56,7 +56,7 @@ Every one of these except `input`, `physicsBody` and `animPlaying` is already a 
 
 ## What this suggests
 
-1. **Graphics commands are the largest blocker** (75 examples, 29%), so deferring them cost real coverage. Design `graphics.commands` next.
+1. **Graphics is the largest blocker** (75 examples, 29%), but most draw from code, often every frame. The decision is to host that code (`scripts` plus an editor-only `placeholder`) and not to put draw commands in the spec. Static drawings may be covered by a future `shapes` type.
 2. **Add the next core types:** `bitmapText` (41 examples) and `tileSprite` (14) are the clear next two. Shapes are a family (about 20 examples) and could be one `shape` type with a `shape` field, or separate types. This needs a design decision.
 3. **Animations are the missing piece for sprites.** Four examples play animations, but any real game with sprites will need them. This needs an animation definition in the project manifest and a field on `sprite` to choose one.
 4. **Behavior stays code**, as the non-goals say. The `scripts` field matters for 46 examples, so the script contract (open question) is worth settling.

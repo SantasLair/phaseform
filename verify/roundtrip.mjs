@@ -92,6 +92,7 @@ async function runOne(i) {
   if (errors.length) r.pageErrors = errors;
   await page.close();
   r.status = r.skip ? 'skipped' : r.error || r.loadError ? 'error' : !r.schemaValid ? 'schema-invalid'
+    : r.report.codeDriven.length ? 'code-driven'
     : r.diff !== 0 ? 'diff' : r.lit === 0 ? 'blank-frame' : r.report.unsupported.length || r.report.lossy.some(l => !l.benign) ? 'exact-but-lossy' : 'exact';
   results[i] = r;
 }

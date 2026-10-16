@@ -4,7 +4,8 @@
   "description": "Harness that checks undocumented Phaser behavior referenced by docs/VERIFICATION.md",
   "scripts": {
     "verify": "node run.mjs",
-    "validate": "node validate.mjs"
+    "validate": "node validate.mjs",
+    "test:scripts": "node scripts-test.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1",

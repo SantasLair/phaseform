@@ -1,16 +1,21 @@
 // Prototype PHASEFORM reference loader: PHASEFORM v0.1 scene document -> objects in a live Phaser 4 scene.
-// Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order.
+// Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order, script hooks.
+// build(scene, doc, { modules }) takes modules as { 'scripts/x.js': { create, update } }. The placeholder is ignored.
 window.PhaseformLoader = (function () {
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
+  const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
+  const flat = (pts) => pts.flatMap(p => [p.x, p.y]);
   const TINT = { multiply: 'MULTIPLY', fill: 'FILL', add: 'ADD', screen: 'SCREEN', overlay: 'OVERLAY', 'hard-light': 'HARD_LIGHT' };
 
   function clear(scene) {
     for (const o of scene.children.list.slice()) o.destroy();
   }
 
-  function build(scene, doc) {
+  function build(scene, doc, opts) {
+    const modules = (opts && opts.modules) || {};
     const warnings = [];
     const ids = new Set();
+    const scripted = [];
 
     function make(d, parent) {
       if (ids.has(d.id)) throw new Error(`duplicate id "${d.id}"`);
@@ -32,6 +37,36 @@ window.PhaseformLoader = (function () {
         case 'container':
           o = scene.add.container(x, y);
           break;
+        case 'graphics':
+          o = scene.add.graphics({ x, y });
+          break;
+        case 'rectangle':
+          o = scene.add.rectangle(x, y, d.width, d.height);
+          break;
+        case 'ellipse':
+          o = scene.add.ellipse(x, y, d.width, d.height);
+          if (d.smoothness !== undefined) o.smoothness = d.smoothness;
+          break;
+        case 'triangle': {
+          const [a, b, c] = d.points;
+          o = scene.add.triangle(x, y, a.x, a.y, b.x, b.y, c.x, c.y);
+          break;
+        }
+        case 'line': {
+          const [a, b] = d.points;
+          o = scene.add.line(x, y, a.x, a.y, b.x, b.y);
+          break;
+        }
+        case 'polygon':
+          o = scene.add.polygon(x, y, flat(d.points));
+          break;
+        case 'star':
+          o = scene.add.star(x, y, d.pointCount === undefined ? 5 : d.pointCount, d.innerRadius, d.outerRadius);
+          break;
+        case 'arc':
+          o = scene.add.arc(x, y, d.radius, d.startAngle, d.endAngle, d.anticlockwise);
+          if (d.iterations !== undefined) o.iterations = d.iterations;
+          break;
         default:
           warnings.push(`${d.id}: unsupported type "${d.type}" skipped`);
           return null;
@@ -45,7 +80,19 @@ window.PhaseformLoader = (function () {
       if (d.data) for (const [k, v] of Object.entries(d.data)) o.setData(k, v);
       if (d.rotation !== undefined) o.setRotation(d.rotation);
       if (d.scale) o.setScale(d.scale.x, d.scale.y);
-      if (d.type !== 'container') {
+      if (SHAPES.has(d.type)) {
+        // a shape drawn without fill or stroke is invisible, so the document must say so explicitly
+        o.isFilled = false; o.isStroked = false;
+        if (d.fill) o.setFillStyle(parseInt(d.fill.color.slice(1), 16), d.fill.alpha);
+        if (d.stroke) {
+          const w = d.stroke.width === undefined ? 1 : d.stroke.width;
+          o.setStrokeStyle(w, parseInt(d.stroke.color.slice(1), 16), d.stroke.alpha);
+          // a WebGL line renders from its own start and end widths, so setStrokeStyle alone leaves it 1px wide
+          if (d.type === 'line') o.setLineWidth(w, d.stroke.endWidth === undefined ? w : d.stroke.endWidth);
+        }
+        if (d.origin) o.setOrigin(d.origin.x, d.origin.y);
+      }
+      if (d.type !== 'container' && d.type !== 'graphics' && !SHAPES.has(d.type)) {
         if (d.origin) o.setOrigin(d.origin.x, d.origin.y);
         if (d.flipX) o.setFlipX(true);
         if (d.flipY) o.setFlipY(true);
@@ -62,12 +109,31 @@ window.PhaseformLoader = (function () {
       if (d.type === 'container') {
         for (const c of d.children || []) { const child = make(c, o); if (child) o.add(child); }
       }
+      const p = d.placeholder;
+      const ctx = { params: d.params ? JSON.parse(JSON.stringify(d.params)) : {}, size: p && p.width && p.height ? { width: p.width, height: p.height } : null };
+      o.setData('phaseform', ctx);
+      if (d.scripts && d.scripts.length) scripted.push({ o, ctx, id: d.id, paths: d.scripts });
       return o;
     }
 
     if (doc.background) scene.cameras.main.setBackgroundColor(doc.background);
     const roots = [];
     for (const d of doc.objects) { const o = make(d, null); if (o) roots.push(o); }
+    // create hooks run once all objects exist, in document order; update hooks run every frame while the object is active
+    const updaters = [];
+    for (const s of scripted) {
+      for (const path of s.paths) {
+        const m = modules[path];
+        if (!m) { warnings.push(`${s.id}: script "${path}" not provided`); continue; }
+        if (m.create) m.create(s.o, scene, s.ctx);
+        if (m.update) updaters.push({ o: s.o, fn: m.update });
+      }
+    }
+    if (updaters.length) {
+      const onUpdate = (time, delta) => { for (const u of updaters) if (u.o.active) u.fn(u.o, scene, time, delta); };
+      scene.events.on('update', onUpdate);
+      scene.events.once('shutdown', () => scene.events.off('update', onUpdate));
+    }
     return { objects: roots, warnings };
   }
 

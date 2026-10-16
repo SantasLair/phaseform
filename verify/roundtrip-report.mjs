@@ -1,7 +1,7 @@
 // Summarizes roundtrip results: pass rate by folder, loss reasons, unsupported types, failures.
 import { readFileSync } from 'node:fs';
 const d = JSON.parse(readFileSync(process.argv[2] ?? 'roundtrip-results.json', 'utf8'));
-const CORE_ONLY = (r) => !r.report || r.report.unsupported.length === 0;
+const CORE_ONLY = (r) => !r.report || (r.report.unsupported.length === 0 && !(r.report.codeDriven && r.report.codeDriven.length));
 console.log('SUMMARY', d.summary, 'total', d.results.length);
 const by = {};
 for (const r of d.results) { const f = r.path.split('/')[2]; (by[f] ??= {})[r.status] = (by[f][r.status] || 0) + 1; }

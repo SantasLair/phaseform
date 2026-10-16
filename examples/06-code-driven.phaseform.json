@@ -1,0 +1,71 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "CodeDriven",
+  "size": { "width": 800, "height": 600 },
+  "background": "#0d0d0d",
+  "objects": [
+    {
+      "id": "health-bar",
+      "type": "graphics",
+      "x": 40,
+      "y": 20,
+      "depth": 10,
+      "scripts": ["scripts/health-bar.js"],
+      "params": { "max": 100, "color": "#cc3333" },
+      "placeholder": {
+        "kind": "rect",
+        "width": 200,
+        "height": 16,
+        "fill": "#cc3333",
+        "alpha": 0.6
+      }
+    },
+    {
+      "id": "radar",
+      "type": "graphics",
+      "x": 600,
+      "y": 400,
+      "scripts": ["scripts/radar.js"],
+      "placeholder": { "kind": "ellipse", "width": 160, "height": 160, "stroke": "#33cc66", "strokeWidth": 2 }
+    },
+    {
+      "id": "arrow",
+      "type": "graphics",
+      "x": 300,
+      "y": 300,
+      "scripts": ["scripts/arrow.js"],
+      "placeholder": {
+        "kind": "polygon",
+        "width": 60,
+        "height": 40,
+        "points": [{ "x": 0, "y": 10 }, { "x": 40, "y": 10 }, { "x": 40, "y": 0 }, { "x": 60, "y": 20 }, { "x": 40, "y": 40 }, { "x": 40, "y": 30 }, { "x": 0, "y": 30 }],
+        "fill": "#ffcc00"
+      }
+    },
+    {
+      "id": "minimap",
+      "type": "graphics",
+      "x": 20,
+      "y": 440,
+      "scripts": ["scripts/minimap.js"],
+      "placeholder": { "kind": "image", "width": 128, "height": 128, "path": "reference/minimap.png" }
+    },
+    {
+      "id": "boss",
+      "type": "sprite",
+      "key": "boss",
+      "x": 400,
+      "y": 200,
+      "scripts": ["scripts/boss-ai.js"],
+      "params": { "speed": 3 }
+    },
+    {
+      "id": "no-preview",
+      "type": "graphics",
+      "x": 10,
+      "y": 10,
+      "scripts": ["scripts/overlay.js"]
+    }
+  ]
+}

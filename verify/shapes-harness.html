@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform shapes probe</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script>
+// Probes the defaults and quirks of Phaser 4 shape game objects for docs/VERIFICATION.md. Results land in window.__results.
+window.__results = null;
+class Probe extends Phaser.Scene {
+  constructor() { super('Probe'); }
+  create() {
+    const r = {};
+    const info = (o) => ({ type: o.type, originX: o.originX, originY: o.originY, width: o.width, height: o.height, displayOriginX: o.displayOriginX, isFilled: o.isFilled, isStroked: o.isStroked, fillColor: o.fillColor, fillAlpha: o.fillAlpha, strokeColor: o.strokeColor, strokeAlpha: o.strokeAlpha, lineWidth: o.lineWidth, closePath: o.closePath, blendMode: o.blendMode, hasTint: typeof o.setTint, hasFlip: typeof o.setFlipX, hasSetSize: typeof o.setSize });
+    const safe = (k, f) => { try { r[k] = f(); } catch (e) { r[k] = { error: String(e) }; } };
+    safe('rectangleBare', () => info(this.add.rectangle(100, 100, 80, 40)));
+    safe('rectangleFilled', () => info(this.add.rectangle(100, 100, 80, 40, 0xff0000, 0.5)));
+    safe('ellipse', () => ({ ...info(this.add.ellipse(100, 100, 80, 40, 0xff0000)), smoothness: this.add.ellipse(0, 0, 1, 1).smoothness }));
+    safe('triangle', () => ({ ...info(this.add.triangle(100, 100, 0, 148, 148, 148, 74, 1, 0xff0000)), geom: (({ x1, y1, x2, y2, x3, y3 }) => ({ x1, y1, x2, y2, x3, y3 }))(this.add.triangle(0, 0, 0, 148, 148, 148, 74, 1).geom) }));
+    safe('line', () => ({ ...info(this.add.line(100, 100, 0, 0, 100, 50, 0xff0000)), geom: (({ x1, y1, x2, y2 }) => ({ x1, y1, x2, y2 }))(this.add.line(0, 0, 0, 0, 100, 50).geom), lineWidthStr: this.add.line(0, 0, 0, 0, 1, 1).lineWidth }));
+    safe('polygon', () => ({ ...info(this.add.polygon(100, 100, [0, 0, 50, 0, 25, 40], 0xff0000)), pts: this.add.polygon(0, 0, '0 0 50 0 25 40').geom.points.length }));
+    safe('star', () => ({ ...info(this.add.star(100, 100, 5, 20, 40, 0xff0000)), pts: this.add.star(0,0,5,20,40).points, inner: this.add.star(0,0,5,20,40).innerRadius, outer: this.add.star(0,0,5,20,40).outerRadius }));
+    safe('arc', () => ({ ...info(this.add.arc(100, 100, 50, 0, 90, false, 0xff0000)), radius: 50, startAngle: this.add.arc(0,0,50,0,90).startAngle, endAngle: this.add.arc(0,0,50,0,90).endAngle, anticlockwise: this.add.arc(0,0,50).anticlockwise, defaults: (({ startAngle, endAngle, iterations, pie }) => ({ startAngle, endAngle, iterations, pie }))(this.add.arc(0,0,50)) }));
+    safe('grid', () => ({ ...info(this.add.grid(100, 100, 80, 40, 20, 20, 0xff0000)), cell: [this.add.grid(0,0,80,40,20,20).cellWidth], altFill: this.add.grid(0,0,80,40,20,20).altFillColor, outline: this.add.grid(0,0,80,40,20,20).showOutline }));
+    safe('isobox', () => info(this.add.isobox(100, 100, 40, 30)));
+    safe('isotriangle', () => info(this.add.isotriangle(100, 100, 40, 30)));
+    safe('curve', () => info(this.add.curve(100, 100, new Phaser.Curves.Spline([0, 0, 50, 50, 100, 0]), 0xff0000)));
+    // setters
+    safe('setStroke', () => { const o = this.add.rectangle(0, 0, 10, 10); o.setStrokeStyle(4, 0x00ff00, 0.7); const a = info(o); o.setFillStyle(0xff0000); const b = info(o); o.setFillStyle(); const c = info(o); o.setStrokeStyle(); return { afterStroke: a, afterFill: b, afterFillNoArgs: c, afterStrokeNoArgs: info(o) }; });
+    safe('rectangleSetSize', () => { const o = this.add.rectangle(0, 0, 10, 10); o.setSize(30, 20); return { w: o.width, h: o.height, geomW: o.geom.width, dispW: o.displayWidth }; });
+    safe('scaleAlphaBlend', () => { const o = this.add.rectangle(0, 0, 10, 10, 0xff0000); o.setScale(2, 3).setRotation(1).setAlpha(0.5).setDepth(3); return { scale: [o.scaleX, o.scaleY], rot: o.rotation, alpha: o.alpha, depth: o.depth, topLeft: o.alphaTopLeft }; });
+    safe('rectangleOrigin', () => { const o = this.add.rectangle(100, 100, 80, 40, 0xff0000); o.setOrigin(0, 0); return { ox: o.originX, geomX: o.geom.x, width: o.width }; });
+    // line width: does setStrokeStyle(width) change how a line renders, or only setLineWidth?
+    this.add.line(0, 0, 50, 50, 250, 50, 0xffffff).setStrokeStyle(20, 0xffffff);      // y=50, band should be 40..60 if honored
+    this.add.line(0, 0, 50, 100, 250, 100, 0xffffff).setLineWidth(20);                // y=100
+    this.add.line(0, 0, 50, 150, 250, 150, 0xffffff).setLineWidth(2, 40);             // taper: thin at x=50, thick at x=250
+    const probes = { strokeStyle: [150, 57], lineWidthCall: [150, 107], taperStart: [52, 156], taperEnd: [248, 156] };
+    r.pixels = {};
+    const keys = Object.keys(probes);
+    this.time.delayedCall(300, () => {
+      const next = () => {
+        const k = keys.shift();
+        if (!k) { window.__results = r; return; }
+        this.renderer.snapshotPixel(probes[k][0], probes[k][1], (c) => { r.pixels[k] = c.red; this.time.delayedCall(50, next); });
+      };
+      next();
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Probe, banner: false, audio: { noAudio: true } });
+</script>

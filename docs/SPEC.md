@@ -9,6 +9,8 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Scope](#scope)
 - [Scene document](#scene-document)
 - [Objects](#objects)
+- [Shapes](#shapes)
+- [Scripts and code-driven objects](#scripts-and-code-driven-objects)
 - [Conventions](#conventions)
 - [Extensions](#extensions)
 - [Versioning](#versioning)
@@ -80,7 +82,9 @@ These apply to every object, including containers.
 | `active` | no | `true` | Whether Phaser updates the object. |
 | `scrollFactor` | no | `{ "x": 1, "y": 1 }` | Camera scroll factor. |
 | `data` | no | none | Free key/value data, applied with the object's data manager. |
-| `scripts` | no | none | Script paths to attach, relative to the project root. |
+| `scripts` | no | none | Script paths to attach, relative to the project root. See [Scripts](#scripts-and-code-driven-objects). |
+| `params` | no | none | Plain JSON passed to the scripts. |
+| `placeholder` | no | none | Editor-only reference visual. Never drawn by a loader. |
 | `extensions` | no | none | Extension data, keyed by extension name. |
 
 On a container, `scrollFactor` affects the container only, not its children.
@@ -93,11 +97,12 @@ On a container, `scrollFactor` affects the container only, not its children.
 | `sprite` | `Sprite` | same as `image` |
 | `text` | `Text` | `text`, `style`, `origin`, `scale`, `rotation`, `tint`, `tintMode`, `blendMode` |
 | `container` | `Container` | `children`, `scale`, `rotation`, `blendMode` |
-| `graphics` | `Graphics` | reserved |
+| `rectangle`, `ellipse`, `triangle`, `line`, `polygon`, `star`, `arc` | the Phaser shape of the same name | [shapes](#shapes) |
+| `graphics` | `Graphics` | none. Code-driven, see [Scripts](#scripts-and-code-driven-objects) |
 
 Fields not listed for a type are invalid on that type. Containers have no `origin`, `flipX`, `flipY`, `tint` or size: Phaser fixes a container's origin, gives it zero intrinsic size, and gives it no tint or flip.
 
-`graphics` is reserved in v0.1. The type name and common fields are valid, and any other fields are preserved but not defined.
+`graphics` is a host for code: the loader creates an empty `Graphics` object with the common fields applied, and its scripts do the drawing. The spec defines no draw commands. Other fields on a `graphics` object are preserved but not defined.
 
 ### Field reference
 
@@ -126,6 +131,37 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 - **`blendMode`.** The four values are the modes WebGL renders natively. Other Phaser modes may render incorrectly in WebGL (`difference` was observed falling back to `normal`), so they are not in the core. Phaser silently treats an unknown name as `normal`, so loaders must reject unknown values themselves. A container has no blend mode of its own by default, so its children keep theirs. Writing `blendMode` on a container sets one explicitly.
 - **`style`.** Phaser's text style config object, passed through unchanged: shadow is nested as `shadow: { offsetX, ... }`, word wrap as `wordWrap: { width, useAdvancedWrap }`, and `padding` goes inside `style`. Phaser's defaults are Courier, 16px, white. A numeric `fontSize` becomes pixels. If `metrics` (`ascent`, `descent`, `fontSize`) is given, Phaser uses it instead of measuring, which changes text height, so it must be preserved.
 - **vec2.** `{ "x": number, "y": number }`.
+
+### Shapes
+
+Seven Phaser shape classes are core types: `rectangle`, `ellipse`, `triangle`, `line`, `polygon`, `star` and `arc`. Static vector art is described with these, not with draw commands. (`grid`, `isobox`, `isotriangle` and `curve` are not in v0.1.)
+
+Shapes share the common fields, plus `origin` (default `{0.5, 0.5}`), `scale`, `rotation` and `blendMode` (default `normal`). They have **no `tint`, `tintMode`, `flipX` or `flipY`** and cannot have children. `alpha` is a single value.
+
+**Fill and stroke.** Shapes are drawn through two optional objects:
+
+| Field | Fields inside | Description |
+|---|---|---|
+| `fill` | `color` (required, `#rrggbb`), `alpha` (default 1) | Absent means not filled. |
+| `stroke` | `color` (required), `width` (default 1), `alpha` (default 1), `endWidth` (line only) | Absent means not stroked. |
+
+A shape with neither is valid and invisible (for example a hit area). `line` is the exception: it requires `stroke` and does not allow `fill`.
+
+**Geometry.** Coordinates are in the shape's local space, and `origin` is applied on top of them.
+
+| Type | Required fields | Optional fields |
+|---|---|---|
+| `rectangle` | `width`, `height` | |
+| `ellipse` | `width`, `height` | `smoothness` (integer, default 64) |
+| `triangle` | `points`: exactly 3 vec2 | |
+| `line` | `points`: exactly 2 vec2, `stroke` | |
+| `polygon` | `points`: 3 or more vec2 | |
+| `star` | `innerRadius`, `outerRadius` | `pointCount` (integer, default 5) |
+| `arc` | `radius` | `startAngle` (default 0), `endAngle` (default 360), `anticlockwise` (default false), `iterations` (default 0.01, smaller is smoother) |
+
+Arc angles are in **degrees**, as Phaser takes them. `rotation` stays in radians. The star field is `pointCount` because `points` is a vertex list on the other shapes. **Line width.** A WebGL line is drawn from its own start and end widths, not from the stroke width alone, so a loader applies `stroke.width` and `stroke.endWidth` with `setLineWidth(width, endWidth)`. `endWidth` defaults to `width`, and it is ignored on other shapes.
+
+How Phaser sizes and positions each shape is recorded in [VERIFICATION.md](VERIFICATION.md).
 
 ### Example
 
@@ -161,6 +197,41 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 ```
 
 More examples are in [examples/](../examples/).
+
+## Scripts and code-driven objects
+
+Some objects have no appearance that data can describe: a health bar redrawn from game state, a radar, a debug overlay. PHASEFORM does not describe draw commands. The object is created with its normal fields and its scripts supply the rest.
+
+### Scripts
+
+`scripts` lists script modules, in order. Each module may export either hook:
+
+- `create(obj, scene, ctx)` runs once, after the object and all its siblings exist.
+- `update(obj, scene, time, delta)` runs every frame while the object is active.
+
+`ctx` holds the object's `params` (an empty object when absent) and `size`, the placeholder's `{ width, height }` (`null` when there is no placeholder). The same `ctx` is available later as `obj.getData("phaseform")`. How a module is loaded and bundled is not defined in v0.1. Any object type may have scripts, not only `graphics`.
+
+### Placeholder
+
+`placeholder` is a reference visual for editors, for objects whose look comes from code.
+
+| Field | Required | Description |
+|---|---|---|
+| `kind` | yes | `rect`, `ellipse`, `polygon` or `image`. |
+| `width`, `height` | yes | Size in local units. The box spans (0, 0) to (width, height) in the object's local space. |
+| `fill`, `stroke` | no | `#rrggbb`. |
+| `strokeWidth`, `alpha` | no | Stroke width in local units. `alpha` is 0 to 1. |
+| `points` | polygon | Three or more vec2 vertices in local space. |
+| `path` | image | Reference image, relative to the project root. |
+
+- **Never drawn by a loader.** The placeholder is editor reference data. At runtime an object whose script draws nothing is invisible. A loader must ignore the placeholder and keep it when saving.
+- **`path` is not an asset key.** It is not in the project manifest and the game never loads it. The editor scales it to `width` and `height`.
+- **Size is shared.** Scripts read `width` and `height` through `ctx.size`, so code can draw to the size set in the editor. Nothing else in the placeholder reaches scripts.
+- **Optional.** Without a placeholder an editor shows a default marker at the object's position, and `ctx.size` is `null`.
+
+### Serializing live scenes
+
+A serializer cannot recover draw code from a live scene. A `Graphics` object serializes as a `graphics` node with its common fields and no placeholder, and what it drew is lost.
 
 ## Conventions
 

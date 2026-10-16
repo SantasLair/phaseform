@@ -116,8 +116,14 @@
         "scripts": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "Script paths to attach, relative to the project root."
+          "description": "Script modules to attach, relative to the project root. Each may export create and update hooks, see docs/SPEC.md (Scripts)."
         },
+        "params": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Plain JSON handed to the attached scripts. Lets one script serve many objects."
+        },
+        "placeholder": { "$ref": "#/$defs/placeholder" },
         "extensions": { "$ref": "#/$defs/extensions" },
         "children": {
           "type": "array",
@@ -132,7 +138,9 @@
         "flipY": { "type": "boolean", "default": false },
         "tint": { "$ref": "#/$defs/color", "description": "Default #ffffff. Invalid on container." },
         "tintMode": { "$ref": "#/$defs/tintMode" },
-        "blendMode": { "$ref": "#/$defs/blendMode" }
+        "blendMode": { "$ref": "#/$defs/blendMode" },
+        "fill": { "$ref": "#/$defs/fill" },
+        "stroke": { "$ref": "#/$defs/stroke" }
       },
       "additionalProperties": true,
       "allOf": [
@@ -158,6 +166,17 @@
           "then": { "$ref": "#/$defs/visualImage" }
         },
         {
+          "if": { "properties": { "type": { "enum": ["rectangle", "ellipse", "triangle", "line", "polygon", "star", "arc"] } }, "required": ["type"] },
+          "then": { "$ref": "#/$defs/shape" }
+        },
+        { "if": { "properties": { "type": { "const": "rectangle" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/rectangle" } },
+        { "if": { "properties": { "type": { "const": "ellipse" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/ellipse" } },
+        { "if": { "properties": { "type": { "const": "triangle" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/triangle" } },
+        { "if": { "properties": { "type": { "const": "line" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/line" } },
+        { "if": { "properties": { "type": { "const": "polygon" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/polygon" } },
+        { "if": { "properties": { "type": { "const": "star" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/star" } },
+        { "if": { "properties": { "type": { "const": "arc" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/arc" } },
+        {
           "if": { "properties": { "type": { "const": "text" } }, "required": ["type"] },
           "then": {
             "allOf": [
@@ -167,6 +186,141 @@
           }
         }
       ]
+    },
+
+    "fill": {
+      "type": "object",
+      "required": ["color"],
+      "properties": {
+        "color": { "$ref": "#/$defs/color" },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1, "default": 1 }
+      },
+      "additionalProperties": true,
+      "description": "Shape fill. Absent means not filled. Valid on shapes only, and not on line."
+    },
+
+    "stroke": {
+      "type": "object",
+      "required": ["color"],
+      "properties": {
+        "color": { "$ref": "#/$defs/color" },
+        "width": { "type": "number", "minimum": 0, "default": 1, "description": "Stroke width in pixels. On a line this is the start width." },
+        "endWidth": { "type": "number", "minimum": 0, "description": "Line only. End width of a tapered stroke (WebGL). Defaults to width." },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1, "default": 1 }
+      },
+      "additionalProperties": true,
+      "description": "Shape outline. Absent means not stroked. Valid on shapes only."
+    },
+
+    "shape": {
+      "not": {
+        "anyOf": [
+          { "required": ["tint"] },
+          { "required": ["tintMode"] },
+          { "required": ["flipX"] },
+          { "required": ["flipY"] },
+          { "required": ["children"] }
+        ]
+      },
+      "description": "Shapes have no tint or flip. They are filled and stroked through fill and stroke."
+    },
+
+    "rectangle": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      }
+    },
+
+    "ellipse": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "smoothness": { "type": "integer", "minimum": 1, "default": 64, "description": "Number of segments used to draw the outline." }
+      }
+    },
+
+    "triangle": {
+      "type": "object",
+      "required": ["points"],
+      "properties": {
+        "points": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/vec2" }, "description": "The three corners, in the shape's local space." }
+      }
+    },
+
+    "line": {
+      "type": "object",
+      "required": ["points", "stroke"],
+      "properties": {
+        "points": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/vec2" }, "description": "Start and end, in the shape's local space." }
+      },
+      "not": { "required": ["fill"] },
+      "description": "A line is only visible through its stroke, so stroke is required and fill is invalid."
+    },
+
+    "polygon": {
+      "type": "object",
+      "required": ["points"],
+      "properties": {
+        "points": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/vec2" }, "description": "Vertices in the shape's local space." }
+      }
+    },
+
+    "star": {
+      "type": "object",
+      "required": ["innerRadius", "outerRadius"],
+      "properties": {
+        "pointCount": { "type": "integer", "minimum": 2, "default": 5, "description": "Number of points. Phaser calls this property points." },
+        "innerRadius": { "type": "number", "minimum": 0 },
+        "outerRadius": { "type": "number", "minimum": 0 }
+      }
+    },
+
+    "arc": {
+      "type": "object",
+      "required": ["radius"],
+      "properties": {
+        "radius": { "type": "number", "minimum": 0 },
+        "startAngle": { "type": "number", "default": 0, "description": "Degrees, as Phaser takes them." },
+        "endAngle": { "type": "number", "default": 360, "description": "Degrees, as Phaser takes them." },
+        "anticlockwise": { "type": "boolean", "default": false },
+        "iterations": { "type": "number", "exclusiveMinimum": 0, "default": 0.01, "description": "Smoothness of the rendered arc. Smaller is smoother." }
+      }
+    },
+
+    "placeholder": {
+      "type": "object",
+      "description": "Editor-only reference visual for an object whose appearance comes from code. A conforming loader never draws it. width and height are required when the placeholder shows a visual, and are exposed to scripts as the object size. The box spans (0, 0) to (width, height) in the object's local space.",
+      "properties": {
+        "kind": { "enum": ["rect", "ellipse", "polygon", "image"] },
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "fill": { "$ref": "#/$defs/color" },
+        "stroke": { "$ref": "#/$defs/color" },
+        "strokeWidth": { "type": "number", "minimum": 0 },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "points": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/vec2" },
+          "description": "Polygon vertices in local space. Polygon only."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference image path relative to the project root. It is not an asset key and is never loaded by the game. Image only."
+        }
+      },
+      "required": ["kind", "width", "height"],
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "polygon" } } }, "then": { "required": ["points"] }, "else": { "not": { "required": ["points"] } } },
+        { "if": { "properties": { "kind": { "const": "image" } } }, "then": { "required": ["path"] }, "else": { "not": { "required": ["path"] } } }
+      ],
+      "additionalProperties": true
     },
 
     "visualImage": {

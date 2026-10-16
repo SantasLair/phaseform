@@ -1,0 +1,50 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>phaseform scripts check</title>
+<script src="node_modules/phaser/dist/phaser.min.js"></script>
+<script src="phaseform-load.js"></script>
+<script src="phaseform-serialize.js"></script>
+<script>
+// Checks the script hooks, ctx and placeholder rules from docs/SPEC.md against Phaser 4. Results land in window.__results.
+window.__results = null;
+
+class Check extends Phaser.Scene {
+  constructor() { super('Check'); }
+  create() {
+    const r = { log: [] };
+    const doc = {
+      format: 'phaseform', version: '0.1.0', key: 'Check', size: { width: 400, height: 300 }, background: '#000000',
+      objects: [
+        { id: 'bar', type: 'graphics', x: 50, y: 50, scripts: ['a.js', 'b.js', 'missing.js'], params: { max: 100 },
+          placeholder: { kind: 'rect', width: 200, height: 16, fill: '#ff0000' } },
+        { id: 'plain', type: 'graphics', scripts: ['a.js'] },
+        { id: 'late', type: 'graphics', x: 5, scripts: ['c.js'], active: false }
+      ]
+    };
+    const ids = (o) => o.getData('phaseform');
+    const modules = {
+      'a.js': {
+        create: (o, scene, ctx) => { r.log.push(['a.create', o.x, JSON.stringify(ctx), scene.children.list.length]); r.sameCtx = ctx === ids(o); },
+        update: (o) => { r.aUpdates = (r.aUpdates || 0) + 1; }
+      },
+      'b.js': { create: () => r.log.push(['b.create']) },
+      'c.js': { update: () => { r.inactiveUpdates = (r.inactiveUpdates || 0) + 1; } }
+    };
+    const built = PhaseformLoader.build(this, doc, { modules });
+    r.warnings = built.warnings;
+    r.types = built.objects.map(o => o.type);
+    const base = this.add.graphics(); r.baselineCommands = base.commandBuffer.length; base.destroy();
+    r.commandsDrawn = built.objects.map(o => o.commandBuffer.length);
+    const ser = PhaseformSerializer.serialize(this);
+    r.serialized = ser.doc.objects.map(o => ({ id: o.id, type: o.type, x: o.x, hasPlaceholder: 'placeholder' in o }));
+    r.codeDriven = ser.report.codeDriven.length;
+    this.time.delayedCall(400, () => {
+      this.renderer.snapshotPixel(100, 55, (c) => {
+        r.pixelUnderPlaceholder = { r: c.red, g: c.green, b: c.blue };
+        window.__results = r;
+      });
+    });
+  }
+}
+new Phaser.Game({ type: Phaser.WEBGL, width: 400, height: 300, scene: Check, banner: false, audio: { noAudio: true } });
+</script>
