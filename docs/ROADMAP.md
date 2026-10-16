@@ -24,6 +24,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not started.
 6. [ ] Reference toolkit, as a thin slice to prove the format is usable before the conformance suite fixes it in place: a runtime loader package (from the prototype), a CLI (`validate`, `build`: registry, stripping, release files), a Vite plugin (scene imports, hot reload) and a small sample game built with them. Packages stay unpublished at 0.x until step 7. Every behavior the tools rely on goes into the spec first.
 7. [ ] Conformance examples for other implementations to check against, drawn largely from the toolkit's tests.
 8. [ ] First editor integration that exports and imports PHASEFORM, reusing the loader and validator.
+9. [ ] Canvas fallback. Phaser 4 still has a Canvas renderer, and a game configured with `Phaser.AUTO` falls back to it when WebGL is unavailable. WebGL stays the normative target, but a loader running under Canvas should degrade instead of failing: build every object, skip the WebGL-only fields (`tint`, `tintMode`, `filters`) with a warning, and promise no pixel accuracy. First run a Canvas probe and the round-trip examples under `Phaser.CANVAS` to see what renders acceptably (core objects, shapes, text, the four blend modes), then write the rule into the spec.
 
 ## Naming notes
 

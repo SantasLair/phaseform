@@ -50,7 +50,7 @@ Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 2
 
 **Useful if** you build a Phaser 4 scene editor, level tool, asset pipeline or exporter, or a game that loads levels as data, and you would rather share a format than invent one.
 
-**Not useful if** you target Phaser 3 or the Canvas renderer: PHASEFORM is Phaser 4 and WebGL only, by design. **Not yet useful if** you need tilemaps or particles. Physics is left to [extensions](docs/SPEC.md#extensions).
+**Not useful if** you target Phaser 3 or design for the Canvas renderer: PHASEFORM targets Phaser 4 with WebGL. A graceful Canvas fallback, for games that drop to Canvas when WebGL is unavailable, is planned. **Not yet useful if** you need tilemaps or particles. Physics is left to [extensions](docs/SPEC.md#extensions).
 
 | | Now | Planned |
 |---|---|---|
