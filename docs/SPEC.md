@@ -242,7 +242,7 @@ Some objects have no appearance that data can describe: a health bar redrawn fro
 - `create(obj, scene, ctx)` runs once, after the object and all its siblings exist.
 - `update(obj, scene, time, delta)` runs every frame while the object is active.
 
-`ctx` holds the object's `params` (an empty object when absent) and `size`, the placeholder's `{ width, height }` (`null` when there is no placeholder). The same `ctx` is available later as `obj.getData("phaseform")`. How a module is loaded and bundled is not defined in v0.1. Any object type may have scripts, not only `graphics`.
+`ctx` holds the object's `params` (an empty object when absent) and `size`, the placeholder's `{ width, height }` (`null` when there is no placeholder). The same `ctx` is available later as `obj.getData("phaseform")`. A loader resolves script paths through a script registry and never imports a path itself. How a build produces the registry is in [PROJECT.md](PROJECT.md#release-builds). Any object type may have scripts, not only `graphics`.
 
 ### Placeholder
 

@@ -8,7 +8,7 @@ An open, declarative file format for describing 2D scenes for [Phaser](https://p
 
 ## Why
 
-Phaser has no standard way to save a scene as data, so every editor, tool and game invents its own. PHASEFORM is one shared format that any tool can write and any Phaser project can read. It is a format, not a tool.
+Phaser has no standard way to save a scene as data, so every editor, tool and game invents its own. PHASEFORM is one shared format that any tool can write and any Phaser project can read. It is a format, not a tool. The project will also provide a small reference toolkit (a runtime loader, a build CLI and a Vite plugin) so the format is easy to adopt, but the spec, not the toolkit, defines the format.
 
 ## What it looks like
 
@@ -45,6 +45,23 @@ Scenes refer to assets by key. A separate project file lists the scenes and maps
 ## How well does it work?
 
 Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 259 official Phaser examples were converted to PHASEFORM and rebuilt: of the 143 that use only core types, 138 rebuild pixel-for-pixel. The rest need object types the core does not have yet, such as dynamic bitmap text, or draw from code (graphics). Details are in the [round-trip results](docs/ROUNDTRIP.md).
+
+## Is it for you?
+
+**Useful if** you build a Phaser 4 scene editor, level tool, asset pipeline or exporter, or a game that loads levels as data, and you would rather share a format than invent one.
+
+**Not useful if** you target Phaser 3 or the Canvas renderer: PHASEFORM is Phaser 4 and WebGL only, by design. **Not yet useful if** you need tilemaps or particles. Physics is left to [extensions](docs/SPEC.md#extensions).
+
+| | Now | Planned |
+|---|---|---|
+| **Covers** | Images, sprites, text, containers, bitmap text, tile sprites, 7 shapes, filters and masks, sprite animations, scripts, project and asset manifest | Under consideration, not yet scheduled: tilemaps, video, dynamic bitmap text, particles, prefabs |
+| **You get** | Spec, JSON Schemas, examples, prototype loader and serializer, test tools | Loader package, build CLI, Vite plugin, sample game, then conformance tests |
+| **Stability** | Draft v0.1: fields may still change | Stable once the conformance tests exist; semver after that |
+| **Integrating** | Write and read plain JSON; validate with the schemas | Load scenes with the loader package; one build step bundles scripts |
+
+**What it costs you:** the format adds no runtime concepts beyond Phaser's own objects. Your tool keeps its own editor state in a separate sidecar file, and passes through any fields it does not understand.
+
+The detailed plan and open questions are in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Documentation
 

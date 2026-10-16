@@ -113,13 +113,49 @@ A reference loader does roughly this:
 2. Create the Phaser game using the `size` of the entry scene.
 3. For each scene, queue the loader calls for its assets (all assets, or the scene's `assets` list).
 4. After loading, create the project's animations that do not exist yet.
-5. Build each scene's objects as described in the scene spec, and start each sprite's animation.
+5. Build each scene's objects as described in the scene spec, resolving scripts through the script registry (see [Release builds](#release-builds)), and start each sprite's animation.
+
+## Release builds
+
+A release build turns a project into the files a game ships. It is optional: a game may load the source files as they are, as long as it supplies its script modules (see below). This section defines what a build may and must do, so that every tool produces the same result.
+
+### Script registry
+
+A scene names scripts by path (`"scripts/health-bar.js"`), relative to the project root. A loader never imports a path itself. It resolves each path through a **script registry**: an object whose keys are script paths, exactly as written in the scenes, and whose values are the modules, each with optional `create` and `update` hooks.
+
+The registry exists because bundlers include only modules that are imported in code. A path inside a JSON file is invisible to them, so the script would be left out of the bundle or renamed. A build collects every script path from every scene in the project and generates the registry as a module the bundler can see:
+
+```js
+import * as s0 from './scripts/health-bar.js';
+import * as s1 from './scripts/radar.js';
+export default { 'scripts/health-bar.js': s0, 'scripts/radar.js': s1 };
+```
+
+- A script path that does not resolve to a file is a build **error**. (At runtime, a path missing from the registry is a warning, as in the scene spec.)
+- The registry is complete before any scene is built, so the loader never waits on an import while building a scene.
+- How the registry is produced is up to the tool. A hand-written registry is also valid.
+
+### Editor-only data
+
+- A build may remove `placeholder` from every object. Loaders never draw it, so the scene renders the same.
+- A build must not remove anything else. Unknown fields and extension data may be read at runtime.
+- The editor sidecar file never ships.
+- A stripped document must still be valid against the schemas.
+
+### Packaging
+
+- **Scene and project files** may ship as separate JSON files, loaded at runtime, or be inlined into the bundle. Separate files can be replaced without rebuilding the game, which suits level updates and mods. Either way the loader receives the same parsed documents.
+- **Asset files** keep their manifest `url` unless the build moves or renames them (for example to add a content hash). In that case the build rewrites the `url` fields, and the result must still be valid. Hashing schemes and hosting are otherwise up to the game.
+
+### Validation
+
+A build validates the project file and every scene file, against the schemas and the rules above, and fails on any error. A runtime loader may skip validation for documents produced by a validated build, but must still check `version` against the versions it supports.
 
 ## Not in this version
 
 - Prefabs, shared object definitions, and the editor sidecar file (separate specs).
 - Asset types beyond the five core types (tilemaps, video, atlas-based bitmap fonts).
-- Asset packs, bundling, hashing, or a CDN base URL.
+- Asset packs, a hashing scheme, or a CDN base URL. (What a build may do is in [Release builds](#release-builds).)
 - Phaser game configuration beyond `size`.
 
 ## Conformance
