@@ -81,4 +81,4 @@ Schemas are [phaseform.schema.json](phaseform.schema.json) and [phaseform.projec
 - **Code, schemas and examples:** [Apache License 2.0](LICENSE).
 - **Specification text:** [Creative Commons Attribution 4.0 International](LICENSE-SPEC).
 
-The name PHASEFORM is not covered by either license.
+The name PHASEFORM is not covered by either license. How you may use it, such as saying your tool "supports PHASEFORM", is in [TRADEMARKS.md](TRADEMARKS.md).
