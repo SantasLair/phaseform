@@ -1,0 +1,41 @@
+{
+  "format": "phaseform-project",
+  "version": "0.1.0",
+  "name": "T",
+  "entry": "A",
+  "scenes": [
+    {
+      "key": "A",
+      "path": "scene.phaseform.json"
+    }
+  ],
+  "assets": [
+    {
+      "key": "coin",
+      "type": "spritesheet",
+      "url": "assets/coin.png",
+      "frameWidth": 16,
+      "frameHeight": 16
+    }
+  ],
+  "animations": [
+    {
+      "key": "a",
+      "frames": [
+        {
+          "key": "coin",
+          "frame": 0
+        }
+      ]
+    },
+    {
+      "key": "a",
+      "frames": [
+        {
+          "key": "coin",
+          "frame": 1
+        }
+      ]
+    }
+  ]
+}

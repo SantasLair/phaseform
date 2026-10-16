@@ -16,7 +16,9 @@ const publicDir = resolve(publicDirArg);
 const docsDir = join(here, 'roundtrip-docs');
 mkdirSync(docsDir, { recursive: true });
 
-const validate = new Ajv2020({ allErrors: true, strict: false }).compile(JSON.parse(readFileSync(join(here, '..', 'phaseform.schema.json'), 'utf8')));
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+const validate = ajv.compile(JSON.parse(readFileSync(join(here, '..', 'phaseform.schema.json'), 'utf8')));
+const validateProject = ajv.compile(JSON.parse(readFileSync(join(here, '..', 'phaseform.project.schema.json'), 'utf8')));
 const srv = await startServer(publicDir, ['phaseform-serialize.js', 'phaseform-load.js']);
 
 function listScripts(dir) {
@@ -46,9 +48,12 @@ const ROUNDTRIP = async () => {
   const A = await snap();
   const { doc, report } = PhaseformSerializer.serialize(sc);
   const json = JSON.parse(JSON.stringify(doc));
+  // animations are rebuilt from their definitions as well, so the definitions are tested
+  const animations = JSON.parse(JSON.stringify(PhaseformSerializer.animations(g)));
   let loadError = null, warnings = [];
   PhaseformLoader.clear(sc);
-  try { warnings = PhaseformLoader.build(sc, json).warnings; } catch (e) { loadError = String(e); }
+  for (const a of animations) g.anims.remove(a.key);
+  try { warnings = PhaseformLoader.build(sc, json, { animations }).warnings; } catch (e) { loadError = String(e); }
   await frames(2);
   const B = await snap();
   let diff = 0, big = 0, lit = 0;
@@ -59,7 +64,7 @@ const ROUNDTRIP = async () => {
     if (d > 0) diff++;
     if (d > 8) big++;
   }
-  return { doc: json, report, loadError, warnings, diff, bigDiff: big, lit, pixels: A.width * A.height };
+  return { doc: json, animations, report, loadError, warnings, diff, bigDiff: big, lit, pixels: A.width * A.height };
 };
 
 const files = folders.flatMap(f => listScripts(join(publicDir, 'src', f))).sort();
@@ -82,6 +87,10 @@ async function runOne(i) {
     if (out.doc) {
       r.schemaValid = validate(out.doc);
       if (!r.schemaValid) r.schemaErrors = validate.errors.slice(0, 3).map(e => `${e.instancePath} ${e.message}`);
+      const project = { format: 'phaseform-project', version: '0.1.0', name: 'roundtrip', entry: out.doc.key, scenes: [{ key: out.doc.key, path: 'scene.json' }], assets: [], animations: out.animations };
+      if (!validateProject(project)) { r.schemaValid = false; r.schemaErrors = (r.schemaErrors || []).concat(validateProject.errors.slice(0, 3).map(e => `project${e.instancePath} ${e.message}`)); }
+      r.animationCount = out.animations.length;
+      delete r.animations;
       r.objectCount = JSON.stringify(out.doc).split('"id"').length - 1;
       writeFileSync(join(docsDir, `${String(i).padStart(4, '0')}.phaseform.json`), JSON.stringify(out.doc, null, 2));
       delete r.doc;

@@ -96,7 +96,7 @@ On a container, `scrollFactor` affects the container only, not its children.
 | Type | Phaser class | Type-specific fields |
 |---|---|---|
 | `image` | `Image` | `key`, `frame`, `origin`, `scale`, `rotation`, `flipX`, `flipY`, `tint`, `tintMode`, `blendMode` |
-| `sprite` | `Sprite` | same as `image` |
+| `sprite` | `Sprite` | same as `image`, plus `animation` |
 | `text` | `Text` | `text`, `style`, `origin`, `scale`, `rotation`, `tint`, `tintMode`, `blendMode` |
 | `container` | `Container` | `children`, `scale`, `rotation`, `blendMode` |
 | `rectangle`, `ellipse`, `triangle`, `line`, `polygon`, `star`, `arc` | the Phaser shape of the same name | [shapes](#shapes) |
@@ -113,6 +113,7 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 | Field | Type | Default | Applies to |
 |---|---|---|---|
 | `key` | string, required | | image, sprite |
+| `animation` | object | none | sprite |
 | `frame` | integer or string | the texture's default frame | image, sprite |
 | `origin` | vec2 | `{0.5, 0.5}`; `{0, 0}` for text | image, sprite, text |
 | `scale` | vec2 | `{1, 1}` | all but graphics |
@@ -133,6 +134,7 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 
 **Notes**
 
+- **`animation`.** `{ "key": "coin-spin", "startFrame": 2 }`: the animation playing when the scene is created, defined in the project ([PROJECT.md](PROJECT.md#animations)). `startFrame` (default 0) is a 0-based index into the animation's frames, which lets a tool save a sprite mid-animation. The loader calls `sprite.play({ key, startFrame })`. Play-time overrides such as `timeScale` are not in v0.1.
 - **`frame`.** An index or a name. Phaser does not fail on a missing frame: it warns and falls back to the default frame, so loaders must validate frames.
 - **`rotation`.** Phaser normalizes rotation to between -π and π. Loaders and tests compare rotations modulo 2π.
 - **`tint`.** Converted to Phaser's numeric tint. Per-corner tint is not in the core.

@@ -2,7 +2,10 @@
   "format": "phaseform",
   "version": "0.1.0",
   "key": "Level1",
-  "size": { "width": 800, "height": 600 },
+  "size": {
+    "width": 800,
+    "height": 600
+  },
   "background": "#87ceeb",
   "objects": [
     {
@@ -12,8 +15,14 @@
       "x": 0,
       "y": 560,
       "depth": 1,
-      "origin": { "x": 0, "y": 0 },
-      "scale": { "x": 25, "y": 1 }
+      "origin": {
+        "x": 0,
+        "y": 0
+      },
+      "scale": {
+        "x": 25,
+        "y": 1
+      }
     },
     {
       "id": "coin-1",
@@ -22,7 +31,10 @@
       "frame": 0,
       "x": 200,
       "y": 420,
-      "depth": 5
+      "depth": 5,
+      "animation": {
+        "key": "coin-spin"
+      }
     },
     {
       "id": "coin-2",
@@ -31,7 +43,11 @@
       "frame": 0,
       "x": 420,
       "y": 340,
-      "depth": 5
+      "depth": 5,
+      "animation": {
+        "key": "coin-spin",
+        "startFrame": 2
+      }
     },
     {
       "id": "player",
@@ -41,8 +57,13 @@
       "x": 120,
       "y": 540,
       "depth": 10,
-      "origin": { "x": 0.5, "y": 1 },
-      "scripts": ["scripts/player.js"]
+      "origin": {
+        "x": 0.5,
+        "y": 1
+      },
+      "scripts": [
+        "scripts/player.js"
+      ]
     },
     {
       "id": "hud",
@@ -58,7 +79,10 @@
           "x": 8,
           "y": 8,
           "alpha": 0.6,
-          "origin": { "x": 0, "y": 0 }
+          "origin": {
+            "x": 0,
+            "y": 0
+          }
         },
         {
           "id": "score",
@@ -66,7 +90,11 @@
           "text": "Score: 0",
           "x": 20,
           "y": 16,
-          "style": { "fontFamily": "Arial", "fontSize": "20px", "color": "#ffffff" }
+          "style": {
+            "fontFamily": "Arial",
+            "fontSize": "20px",
+            "color": "#ffffff"
+          }
         }
       ]
     }

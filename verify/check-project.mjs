@@ -31,6 +31,16 @@ export function checkProject(projectPath) {
     ns.set(a.key, a);
   }
 
+  // animations: unique keys, frames point at texture assets
+  const animKeys = new Set();
+  for (const a of project.animations ?? []) {
+    if (animKeys.has(a.key)) errors.push(`duplicate animation key "${a.key}"`);
+    animKeys.add(a.key);
+    for (const f of a.frames) {
+      if (!textures.has(f.key)) warnings.push(`animation "${a.key}" uses texture "${f.key}" not in the manifest`);
+    }
+  }
+
   // scenes
   const sceneKeys = new Set();
   const sizes = new Set();
@@ -56,6 +66,7 @@ export function checkProject(projectPath) {
         else if (entry.assets && !entry.assets.includes(o.font)) warnings.push(`scene "${entry.key}": object "${o.id}" uses font "${o.font}" not in the scene's asset list`);
         continue;
       }
+      if (o.animation && !animKeys.has(o.animation.key)) warnings.push(`scene "${entry.key}": object "${o.id}" plays animation "${o.animation.key}" not in the project`);
       if (o.type !== 'image' && o.type !== 'sprite' && o.type !== 'tileSprite') continue;
       const tex = textures.get(o.key);
       if (!tex || !IMAGE_REF_TYPES.has(tex.type)) { warnings.push(`scene "${entry.key}": object "${o.id}" uses texture "${o.key}" not in the manifest`); continue; }

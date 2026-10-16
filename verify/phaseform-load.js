@@ -1,6 +1,7 @@
 // Prototype PHASEFORM reference loader: PHASEFORM v0.1 scene document -> objects in a live Phaser 4 scene.
 // Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order, script hooks.
-// build(scene, doc, { modules }) takes modules as { 'scripts/x.js': { create, update } }. The placeholder is ignored.
+// build(scene, doc, { modules, animations }) takes modules as { 'scripts/x.js': { create, update } } and the project's
+// animation definitions, which are created in the game's animation manager if missing. The placeholder is ignored.
 window.PhaseformLoader = (function () {
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
@@ -17,6 +18,7 @@ window.PhaseformLoader = (function () {
     const warnings = [];
     const ids = new Set();
     const scripted = [];
+    for (const a of (opts && opts.animations) || []) if (!scene.anims.exists(a.key)) scene.anims.create(JSON.parse(JSON.stringify(a)));
 
     function make(d, parent) {
       if (ids.has(d.id)) throw new Error(`duplicate id "${d.id}"`);
@@ -121,6 +123,10 @@ window.PhaseformLoader = (function () {
       if (d.blendMode !== undefined) {
         if (!BLEND[d.blendMode]) throw new Error(`${d.id}: unknown blendMode "${d.blendMode}"`);
         o.setBlendMode(Phaser.BlendModes[BLEND[d.blendMode]]);
+      }
+      if (d.animation) {
+        if (!scene.anims.exists(d.animation.key)) warnings.push(`${d.id}: animation "${d.animation.key}" not defined`);
+        else o.play({ key: d.animation.key, startFrame: d.animation.startFrame || 0 });
       }
       if (d.type === 'container') {
         for (const c of d.children || []) { const child = make(c, o); if (child) o.add(child); }

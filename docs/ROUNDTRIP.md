@@ -2,25 +2,26 @@
 
 Does the PHASEFORM v0.1 core describe real Phaser scenes well enough to rebuild them? Each official example is run on Phaser 4.2.1 (WebGL), paused after `create()`, serialized to a PHASEFORM document, validated against the schema, rebuilt in the same page by the reference loader, and compared pixel for pixel with the original frame.
 
-Tools (all in [verify/](../verify/)): `phaseform-serialize.js` (live scene to document), `phaseform-load.js` (document to scene), `roundtrip.mjs` (runner), `roundtrip-report.mjs` (summary). Examples: [phaserjs/examples](https://github.com/phaserjs/examples) commit `68140eca` (MIT code). Same 259 examples as [SURVEY.md](SURVEY.md). Run date: 2026-10-15 (re-run after code-driven objects and shapes were added).
+$1
+Animations are rebuilt too: the runner removes every animation from the game, recreates them from the serialized project definitions, and the rebuilt sprites start them at the saved `startFrame`. The definitions are validated against the project schema.
 
 ## Results
 
 | Status | Count |
 |---|---|
-| pixel-exact | 134 |
+| pixel-exact | 135 |
 | exact, with unsupported types present | 1 |
-| pixels differ | 32 |
+| pixels differ | 31 |
 | code-driven (contains a `Graphics` object; draw code is not recoverable, so not comparable) | 84 |
 | skipped (multi-scene, or scene not running) | 7 |
 | error (snapshot timeout) | 1 |
 | schema-invalid output | 0 |
 
-**Examples using only core types (143): 134 exact, 9 differ.** Every generated document was schema-valid. The core now includes seven shapes, `bitmapText` and `tileSprite`, so 43 more examples count as core-only than in the first run. All 14 tile sprite examples are exact.
+**Examples using only core types (143): 135 exact, 8 differ.** Every generated document was schema-valid. The core now includes seven shapes, `bitmapText` and `tileSprite`, so 43 more examples count as core-only than in the first run. All 14 tile sprite examples are exact.
 
 The other 116 contain a `Graphics` object (84 examples, reported as code-driven), an object type the core does not have (mostly `DynamicBitmapText` (13), and the shapes left out of v0.1: `grid`, `isobox`, `isotriangle`, `curve`), or could not be compared.
 
-### The 9 core-only examples that differ in this run
+### Core-only examples that differ
 
 | Example | Cause |
 |---|---|
@@ -30,9 +31,9 @@ The other 116 contain a `Graphics` object (84 examples, reported as code-driven)
 | text/text gradient | text color is a `CanvasGradient`, not JSON |
 | text/word wrap by callback | `wordWrap.callback` is a function, not data |
 | bitmaptext/tinted text | per-corner tint, not in the spec |
-| container/non exclusive containers | **unexplained**, intermittent: differs in some runs (see below) |
+| container/non exclusive containers | **unexplained**, intermittent: differs in some runs (exact in the latest; see below) |
 
-The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, 71, 62, 71 and 155 in later runs, and exact in some. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
+The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, 71, 62, 71 and 155 in later runs, and exact in others including the latest. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
 
 ## What the round-trip changed in the spec
 

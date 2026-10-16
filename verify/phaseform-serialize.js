@@ -26,6 +26,25 @@ window.PhaseformSerializer = (function () {
     return null;
   }
 
+  function animationDef(a) {
+    const out = { key: a.key, frames: a.frames.map(f => {
+      const fr = { key: f.textureKey };
+      if (f.textureFrame !== undefined && f.textureFrame !== '__BASE') fr.frame = f.textureFrame;
+      if (f.duration) fr.duration = f.duration;
+      return fr;
+    }) };
+    out.frameRate = a.frameRate;
+    for (const [k, d] of [['delay', 0], ['repeat', 0], ['repeatDelay', 0], ['yoyo', false], ['showBeforeDelay', false], ['showOnStart', false], ['hideOnComplete', false], ['skipMissedFrames', true], ['randomFrame', false]]) {
+      if (a[k] !== d) out[k] = a[k];
+    }
+    return out;
+  }
+
+  // Animations are global to the game, so they belong in the project file, not the scene document.
+  function animations(game) {
+    return game.anims.anims.getArray().map(animationDef);
+  }
+
   function serialize(scene) {
     const game = scene.sys.game;
     const report = { lossy: [], unsupported: [], codeDriven: [] };
@@ -86,7 +105,15 @@ window.PhaseformSerializer = (function () {
       if (o.isCropped) report.lossy.push({ id, field: 'crop', why: 'crop not in spec' });
       if (o.input) report.lossy.push({ id, field: 'input', why: 'input is behavior', benign: true });
       if (o.body) report.lossy.push({ id, field: 'physics body', why: 'extension territory', benign: true });
-      if (o.anims && o.anims.isPlaying) report.lossy.push({ id, field: 'animation', why: 'animations not in spec', benign: true });
+      if (o.anims && o.anims.isPlaying && o.anims.currentAnim) {
+        if (type === 'sprite') {
+          out.animation = { key: o.anims.currentAnim.key };
+          const at = o.anims.currentFrame ? o.anims.currentFrame.index - 1 : 0; // AnimationFrame.index is 1-based, startFrame is 0-based
+          if (at) out.animation.startFrame = at;
+          if (o.anims.timeScale !== 1) report.lossy.push({ id, field: 'animation.timeScale', why: 'not in spec' });
+        } else report.lossy.push({ id, field: 'animation', why: 'animations on ' + type + ' not in spec' });
+      }
+      if (o.anims && o.anims.anims && o.anims.anims.size) report.lossy.push({ id, field: 'animation', why: 'sprite-local animations not in spec' });
 
       if (o.rotation) out.rotation = o.rotation;
       if (o.scaleX !== 1 || o.scaleY !== 1) out.scale = { x: o.scaleX, y: o.scaleY };
@@ -194,5 +221,5 @@ window.PhaseformSerializer = (function () {
     return { doc, report };
   }
 
-  return { serialize };
+  return { serialize, animations };
 })();

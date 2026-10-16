@@ -44,7 +44,7 @@ Scenes refer to assets by key. A separate project file lists the scenes and maps
 
 ## How well does it work?
 
-Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 259 official Phaser examples were converted to PHASEFORM and rebuilt: of the 143 that use only core types, 134 rebuild pixel-for-pixel. The rest need object types the core does not have yet, such as dynamic bitmap text, or draw from code (graphics). Details are in the [round-trip results](docs/ROUNDTRIP.md).
+Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 259 official Phaser examples were converted to PHASEFORM and rebuilt: of the 143 that use only core types, 135 rebuild pixel-for-pixel. The rest need object types the core does not have yet, such as dynamic bitmap text, or draw from code (graphics). Details are in the [round-trip results](docs/ROUNDTRIP.md).
 
 ## Documentation
 

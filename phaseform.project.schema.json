@@ -22,6 +22,11 @@
       "type": "array",
       "items": { "$ref": "#/$defs/asset" }
     },
+    "animations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/animation" },
+      "description": "Animations, global to the game as in Phaser's animation manager. Sprites refer to them by key."
+    },
     "extensions": { "$ref": "#/$defs/extensions" }
   },
   "additionalProperties": true,
@@ -37,6 +42,42 @@
       "minLength": 1,
       "not": { "pattern": "\\\\|^/|^[A-Za-z]:|(^|/)\\.\\.(/|$)" },
       "description": "Path relative to the project root, forward slashes, no leading slash, drive letter, or parent traversal."
+    },
+
+    "animation": {
+      "type": "object",
+      "required": ["key", "frames"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["key"],
+            "properties": {
+              "key": { "type": "string", "minLength": 1, "description": "Texture key." },
+              "frame": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "string", "minLength": 1 }], "description": "Frame in that texture. Defaults to the texture's default frame." },
+              "duration": { "type": "number", "minimum": 0, "default": 0, "description": "Extra milliseconds this frame stays on screen." },
+              "visible": { "type": "boolean", "description": "Sets the sprite's visibility while this frame shows." }
+            },
+            "additionalProperties": true
+          },
+          "description": "Frames in play order."
+        },
+        "frameRate": { "type": "number", "exclusiveMinimum": 0, "description": "Frames per second. Phaser uses 24 when neither frameRate nor duration is given." },
+        "duration": { "type": "number", "exclusiveMinimum": 0, "description": "Total length in milliseconds, used when frameRate is absent." },
+        "delay": { "type": "number", "minimum": 0, "default": 0 },
+        "repeat": { "type": "integer", "minimum": -1, "default": 0, "description": "-1 repeats forever." },
+        "repeatDelay": { "type": "number", "minimum": 0, "default": 0 },
+        "yoyo": { "type": "boolean", "default": false },
+        "showBeforeDelay": { "type": "boolean", "default": false },
+        "showOnStart": { "type": "boolean", "default": false },
+        "hideOnComplete": { "type": "boolean", "default": false },
+        "skipMissedFrames": { "type": "boolean", "default": true },
+        "randomFrame": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": true
     },
 
     "sceneEntry": {

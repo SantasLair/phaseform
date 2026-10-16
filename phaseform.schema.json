@@ -141,7 +141,8 @@
         "blendMode": { "$ref": "#/$defs/blendMode" },
         "fill": { "$ref": "#/$defs/fill" },
         "stroke": { "$ref": "#/$defs/stroke" },
-            "dropShadow": { "$ref": "#/$defs/dropShadow" }
+            "dropShadow": { "$ref": "#/$defs/dropShadow" },
+        "animation": { "$ref": "#/$defs/animation" }
       },
       "additionalProperties": true,
       "allOf": [
@@ -165,6 +166,10 @@
         {
           "if": { "properties": { "type": { "enum": ["image", "sprite", "tileSprite"] } }, "required": ["type"] },
           "then": { "$ref": "#/$defs/visualImage" }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["image", "tileSprite", "text", "bitmapText", "container", "graphics", "rectangle", "ellipse", "triangle", "line", "polygon", "star", "arc"] } }, "required": ["type"] },
+          "then": { "not": { "required": ["animation"] } }
         },
         {
           "if": { "properties": { "type": { "const": "tileSprite" } }, "required": ["type"] },
@@ -229,6 +234,17 @@
       },
       "additionalProperties": true,
       "description": "Shape outline. Absent means not stroked. Valid on shapes only."
+    },
+
+    "animation": {
+      "type": "object",
+      "required": ["key"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1, "description": "Key of an animation in the project's animations." },
+        "startFrame": { "type": "integer", "minimum": 0, "default": 0, "description": "Index into the animation's frames to start from." }
+      },
+      "additionalProperties": true,
+      "description": "Sprite only. The animation playing when the scene is created."
     },
 
     "tileSprite": {

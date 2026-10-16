@@ -31,6 +31,7 @@ The project file is named `phaseform.project.json` by convention. Its directory 
 | `entry` | yes | Key of the scene that starts first. Must match a scene in `scenes`. |
 | `scenes` | yes | Non-empty list of scene entries. |
 | `assets` | yes | Asset manifest. May be empty. |
+| `animations` | no | Animation definitions. See [Animations](#animations). |
 | `extensions` | no | Project-level extension data, same rules as scene extensions. |
 
 ### Scene entries
@@ -66,6 +67,30 @@ Core types:
 
 Anything else (tilemaps, video, scripts) is an unknown type in v0.1: it is preserved but not defined.
 
+## Animations
+
+Phaser keeps animations in one manager for the whole game, so they are defined once in the project and sprites refer to them by key (see `animation` in the scene spec). Each entry is Phaser's animation config with the frames written out:
+
+```json
+"animations": [
+  { "key": "coin-spin", "frameRate": 10, "repeat": -1,
+    "frames": [{ "key": "coin", "frame": 0 }, { "key": "coin", "frame": 1 }, { "key": "coin", "frame": 2 }] }
+]
+```
+
+| Field | Required | Default | Description |
+|---|---|---|---|
+| `key` | yes | | Unique among animations. |
+| `frames` | yes | | Non-empty list in play order. Each has `key` (texture), optional `frame`, `duration` (extra ms on this frame) and `visible`. |
+| `frameRate` | no | 24 if `duration` is also absent | Frames per second. |
+| `duration` | no | | Total length in ms, used when `frameRate` is absent. |
+| `delay`, `repeatDelay` | no | `0` | Milliseconds. |
+| `repeat` | no | `0` | `-1` repeats forever. |
+| `yoyo`, `showBeforeDelay`, `showOnStart`, `hideOnComplete`, `randomFrame` | no | `false` | As in Phaser. |
+| `skipMissedFrames` | no | `true` | As in Phaser. |
+
+Frames are always listed one by one. Phaser's shortcuts (`generateFrameNumbers`, a texture key standing for all its frames) are for code; a tool expands them before saving. Sprite-local animations (`sprite.anims.create`) are not in v0.1.
+
 ## Rules
 
 - **Key uniqueness.** Image, spritesheet, atlas and bitmapFont keys share Phaser's texture namespace (a bitmap font's image is added to the texture manager under the font's key) and must be unique among themselves. Audio keys are unique among audio. Different namespaces may reuse a key.
@@ -74,6 +99,7 @@ Anything else (tilemaps, video, scripts) is an unknown type in v0.1: it is prese
 - **Per-scene `assets`** must name keys that exist in the manifest.
 - **Texture references.** Every `key` used by an `image` or `sprite` object in a scene should be a texture asset in the manifest. A missing one is a **warning**, not an error: Phaser would draw its placeholder texture, but a project may load some assets by other means.
 - **Font references.** The `font` of a `bitmapText` object should be a `bitmapFont` asset in the manifest. A missing one is a **warning**, as for textures.
+- **Animations.** Animation keys are unique (error). Each frame's `key` should be a texture asset (warning). A sprite's `animation.key` should be an animation in the project (warning: Phaser warns and plays nothing).
 - **Frames.** A scene object's `frame` should exist in its texture. Phaser does not fail on a missing frame; it warns and silently falls back to the default, so loaders must check. Where the manifest cannot say (no `frames` count, atlas not readable), skip the check.
 - **Scene sizes.** All scenes in a project should have the same `size`. A loader warns when they differ.
 - **Scene file validity.** Every scene file must itself be valid against the scene schema.
@@ -86,12 +112,13 @@ A reference loader does roughly this:
 1. Read the project file and validate it against [phaseform.project.schema.json](../phaseform.project.schema.json).
 2. Create the Phaser game using the `size` of the entry scene.
 3. For each scene, queue the loader calls for its assets (all assets, or the scene's `assets` list).
-4. After loading, build each scene's objects as described in the scene spec.
+4. After loading, create the project's animations that do not exist yet.
+5. Build each scene's objects as described in the scene spec, and start each sprite's animation.
 
 ## Not in this version
 
 - Prefabs, shared object definitions, and the editor sidecar file (separate specs).
-- Asset types beyond the four core types.
+- Asset types beyond the five core types (tilemaps, video, atlas-based bitmap fonts).
 - Asset packs, bundling, hashing, or a CDN base URL.
 - Phaser game configuration beyond `size`.
 
