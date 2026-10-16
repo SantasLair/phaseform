@@ -7,8 +7,8 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkProject } from './check-project.mjs';
-import { checkScene } from './check-scene.mjs';
+import { checkProject } from '../packages/cli/src/check-project.mjs';
+import { checkScene } from '../packages/cli/src/check-scene.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ajv = new Ajv2020({ allErrors: true, strict: false });

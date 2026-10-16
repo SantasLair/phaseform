@@ -1,0 +1,11 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Main",
+  "size": { "width": 320, "height": 240 },
+  "objects": [
+    { "id": "hero", "type": "image", "key": "hero", "x": 10, "y": 20 },
+    { "id": "bar", "type": "graphics", "x": 5, "y": 5, "scripts": ["scripts/bar.js"],
+      "placeholder": { "kind": "rect", "width": 100, "height": 10, "fill": "#cc3333" } }
+  ]
+}

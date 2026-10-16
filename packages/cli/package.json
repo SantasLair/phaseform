@@ -1,0 +1,11 @@
+{
+  "name": "phaseform-cli",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Validates and builds PHASEFORM projects (unpublished reference CLI)",
+  "type": "module",
+  "bin": { "phaseform": "bin/phaseform.mjs" },
+  "dependencies": { "ajv": "^8.20.0" },
+  "scripts": { "test": "node test/cli.test.mjs" },
+  "license": "MIT"
+}
