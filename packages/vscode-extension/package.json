@@ -1,0 +1,43 @@
+{
+  "name": "phaseform-vscode",
+  "displayName": "PHASEFORM Scene Editor",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Visual editor for PHASEFORM scene files (draft)",
+  "publisher": "phaseform",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Visualization", "Other"],
+  "main": "./src/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "phaseform.sceneEditor",
+        "displayName": "PHASEFORM Scene Editor",
+        "selector": [{ "filenamePattern": "*.phaseform.json" }],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      { "command": "phaseform.openEditor", "title": "PHASEFORM: Open Scene in Visual Editor" }
+    ],
+    "menus": {
+      "editor/title": [
+        { "command": "phaseform.openEditor", "when": "resourceFilename =~ /phaseform.json$/", "group": "navigation" }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node test/edits.test.mjs && node test/webview.test.mjs"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1",
+    "phaseform-cli": "file:../cli"
+  },
+  "devDependencies": {
+    "phaser": "4.2.1",
+    "playwright-core": "^1.50.0"
+  },
+  "license": "MIT"
+}

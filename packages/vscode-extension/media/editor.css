@@ -1,0 +1,20 @@
+:root { color-scheme: light dark; }
+html, body { height: 100%; margin: 0; }
+body { display: grid; grid-template-columns: 200px 1fr 250px; grid-template-rows: auto 1fr; font: 12px var(--vscode-font-family, system-ui, sans-serif); color: var(--vscode-foreground, #ccc); background: var(--vscode-editor-background, #1e1e1e); }
+#bar { grid-column: 1 / 4; display: flex; gap: 8px; align-items: center; padding: 4px 8px; border-bottom: 1px solid var(--vscode-panel-border, #444); }
+#bar button { background: var(--vscode-button-secondaryBackground, #3a3d41); color: var(--vscode-button-secondaryForeground, #fff); border: 0; padding: 2px 8px; cursor: pointer; }
+#status { margin-left: auto; opacity: .85; }
+#status.bad { color: var(--vscode-errorForeground, #f48771); opacity: 1; }
+#tree, #props { overflow: auto; padding: 6px; border-right: 1px solid var(--vscode-panel-border, #444); }
+#props { border-right: 0; border-left: 1px solid var(--vscode-panel-border, #444); }
+#tree .row { padding: 2px 4px; cursor: pointer; white-space: nowrap; }
+#tree .row:hover { background: var(--vscode-list-hoverBackground, #2a2d2e); }
+#tree .row.sel { background: var(--vscode-list-activeSelectionBackground, #094771); color: var(--vscode-list-activeSelectionForeground, #fff); }
+#tree .type { opacity: .6; margin-left: 6px; }
+#stage-wrap { overflow: auto; padding: 16px; background: repeating-conic-gradient(#0002 0 25%, transparent 0 50%) 0 0 / 16px 16px; }
+#stage { display: inline-block; line-height: 0; box-shadow: 0 0 0 1px #888; }
+#stage canvas { cursor: crosshair; }
+#props label { display: grid; grid-template-columns: 70px 1fr; gap: 6px; align-items: center; margin: 3px 0; }
+#props input[type=text], #props input[type=number] { width: 100%; box-sizing: border-box; background: var(--vscode-input-background, #3c3c3c); color: var(--vscode-input-foreground, #ccc); border: 1px solid var(--vscode-input-border, #555); padding: 2px 4px; }
+#props h3 { margin: 4px 0 8px; font-size: 12px; }
+#props .hint { opacity: .6; }
