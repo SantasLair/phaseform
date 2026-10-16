@@ -161,8 +161,9 @@ window.PhaseformSerializer = (function () {
       } else if (type === 'text') {
         out.text = o.text;
         const style = textStyle(o, id);
+        // Phaser reads lineSpacing from the style config, but keeps it on the object, not in style.toJSON()
+        if (o.lineSpacing) style.lineSpacing = o.lineSpacing;
         if (Object.keys(style).length) out.style = style;
-        if (o.lineSpacing) report.lossy.push({ id, field: 'lineSpacing', why: 'not in spec' });
       } else if (type === 'bitmapText') {
         out.font = o.font;
         out.text = o.text;

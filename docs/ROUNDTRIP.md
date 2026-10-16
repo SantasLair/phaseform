@@ -9,15 +9,15 @@ Animations are rebuilt too: the runner removes every animation from the game, re
 
 | Status | Count |
 |---|---|
-| pixel-exact | 135 |
+| pixel-exact | 136 |
 | exact, with unsupported types present | 1 |
-| pixels differ | 31 |
+| pixels differ | 30 |
 | code-driven (contains a `Graphics` object; draw code is not recoverable, so not comparable) | 84 |
 | skipped (multi-scene, or scene not running) | 7 |
 | error (snapshot timeout) | 1 |
 | schema-invalid output | 0 |
 
-**Examples using only core types (143): 135 exact, 8 differ.** Every generated document was schema-valid. The core now includes seven shapes, `bitmapText` and `tileSprite`, so 43 more examples count as core-only than in the first run. All 14 tile sprite examples are exact.
+**Examples using only core types (143): 136 exact, 7 differ.** Every generated document was schema-valid. The core now includes seven shapes, `bitmapText` and `tileSprite`, so 43 more examples count as core-only than in the first run. All 14 tile sprite examples are exact.
 
 The other 116 contain a `Graphics` object (84 examples, reported as code-driven), an object type the core does not have (mostly `DynamicBitmapText` (13), and the shapes left out of v0.1: `grid`, `isobox`, `isotriangle`, `curve`), or could not be compared.
 
@@ -27,13 +27,12 @@ The other 116 contain a `Graphics` object (84 examples, reported as code-driven)
 |---|---|
 | container/container mask, container as mask | masks and filters are not in the spec |
 | container/child blend mode | uses blend modes 7 (color dodge) and 11 (difference), outside the 4-mode core |
-| text/line spacing, group/sprite pool | `lineSpacing` is not in the spec |
 | text/text gradient | text color is a `CanvasGradient`, not JSON |
 | text/word wrap by callback | `wordWrap.callback` is a function, not data |
 | bitmaptext/tinted text | per-corner tint, not in the spec |
-| container/non exclusive containers | **unexplained**, intermittent: differs in some runs (exact in the latest; see below) |
+| container/non exclusive containers | **unexplained**, intermittent: differs in some runs (see below) |
 
-The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, 71, 62, 71 and 155 in later runs, and exact in others including the latest. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
+The "non exclusive containers" example differs only some of the time: 155, 0 and 116 differing pixels in three runs, then exact, then 178, exact, 71, 62, 71 and 155 in later runs, 88 in the latest, and exact in others. Its cause is still unexplained. Shared children (one object in several containers) remain a hypothesis, not a finding.
 
 ## What the round-trip changed in the spec
 
@@ -44,8 +43,9 @@ Bugs found by running real examples, all now fixed:
 4. **Line width.** A WebGL line is drawn from its own start and end widths, so `setStrokeStyle` alone leaves it 1px wide. The loader now calls `setLineWidth`, and `stroke.endWidth` was added for tapered lines.
 5. **Arc iterations.** `iterations` changes how smoothly an arc is drawn and was added to `arc`.
 6. **Effective origin.** An example assigned `originX` directly, which changes the property but not the rendering. The serializer now reads the effective origin from the display origin (see VERIFICATION item 19).
+7. **Text line spacing.** `lineSpacing` lives on the Text object, not in `style.toJSON()`, but the constructor reads it from the style config, so it is written as `style.lineSpacing`. This fixed `text/line spacing` and `group/sprite pool`.
 
-Confirmed gaps, not yet in the spec: `Graphics` commands, `BitmapText`, `TileSprite`, shapes, masks and filters, `lineSpacing`, gradient and callback text values, and sprite animations (43 benign occurrences).
+Confirmed gaps, not yet in the spec: masks and filters, blend modes outside the four WebGL-native ones, per-corner tint, gradient and callback text values, `DynamicBitmapText`, the shapes `grid`, `isobox`, `isotriangle` and `curve`, `Blitter` and particle emitters. `Graphics` draw commands are out by design: graphics objects are code-driven.
 
 ## Caveats
 
