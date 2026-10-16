@@ -1,0 +1,14 @@
+{
+  "format": "phaseform-project",
+  "version": "0.1.0",
+  "name": "Coin Run",
+  "entry": "Main",
+  "scenes": [{ "key": "Main", "path": "scenes/main.phaseform.json" }],
+  "assets": [
+    { "key": "coin", "type": "spritesheet", "url": "assets/coin.png", "frameWidth": 16, "frameHeight": 16, "frames": 4 },
+    { "key": "ground", "type": "image", "url": "assets/ground.png" }
+  ],
+  "animations": [
+    { "key": "coin-spin", "frameRate": 8, "repeat": -1, "frames": [{ "key": "coin", "frame": 0 }, { "key": "coin", "frame": 1 }, { "key": "coin", "frame": 2 }, { "key": "coin", "frame": 3 }] }
+  ]
+}

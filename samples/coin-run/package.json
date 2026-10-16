@@ -1,0 +1,8 @@
+{
+  "name": "coin-run",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vite build", "validate": "phaseform validate phaseform.project.json", "test": "node test.mjs" },
+  "dependencies": { "phaser": "4.2.1" },
+  "devDependencies": { "vite": "^8.0.0", "phaseform-vite-plugin": "file:../../packages/vite-plugin", "phaseform-loader": "file:../../packages/loader", "phaseform-cli": "file:../../packages/cli", "playwright-core": "^1.50.0" }
+}

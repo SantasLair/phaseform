@@ -1,0 +1,14 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Main",
+  "size": { "width": 320, "height": 180 },
+  "background": "#223344",
+  "objects": [
+    { "id": "ground", "type": "tileSprite", "key": "ground", "x": 0, "y": 140, "width": 320, "height": 40, "origin": { "x": 0, "y": 0 } },
+    { "id": "coin", "type": "sprite", "key": "coin", "x": 160, "y": 100, "scale": { "x": 3, "y": 3 }, "animation": { "key": "coin-spin" } },
+    { "id": "title", "type": "text", "text": "COIN RUN", "x": 160, "y": 20, "origin": { "x": 0.5, "y": 0.5 }, "style": { "fontSize": "20px", "color": "#ffffff" } },
+    { "id": "timer", "type": "graphics", "x": 10, "y": 160, "scripts": ["scripts/timer-bar.js"], "params": { "width": 100, "color": "#ffcc33", "seconds": 5 },
+      "placeholder": { "kind": "rect", "width": 100, "height": 8, "fill": "#ffcc33" } }
+  ]
+}

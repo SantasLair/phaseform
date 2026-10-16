@@ -287,5 +287,19 @@ export function createLoader(Phaser) {
     return { objects: roots, warnings };
   }
 
-  return { build, clear };
+  // Queues the loader calls for a project's assets (or only `keys`, a scene entry's asset list). Call from preload().
+  function loadAssets(scene, project, keys) {
+    for (const a of project.assets) {
+      if (keys && !keys.includes(a.key)) continue;
+      switch (a.type) {
+        case 'image': scene.load.image(a.key, a.url); break;
+        case 'spritesheet': scene.load.spritesheet(a.key, a.url, pick(a, ['frameWidth', 'frameHeight', 'startFrame', 'endFrame', 'margin', 'spacing'])); break;
+        case 'atlas': scene.load.atlas(a.key, a.url, a.atlasUrl); break;
+        case 'bitmapFont': scene.load.bitmapFont(a.key, a.url, a.dataUrl); break;
+        case 'audio': scene.load.audio(a.key, a.urls); break;
+      }
+    }
+  }
+
+  return { build, clear, loadAssets };
 }
