@@ -1,0 +1,14 @@
+{
+  "name": "phaseform-vite-plugin",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Vite plugin that serves a PHASEFORM project as the module virtual:phaseform (unpublished reference plugin)",
+  "type": "module",
+  "main": "src/index.mjs",
+  "exports": { ".": "./src/index.mjs" },
+  "scripts": { "test": "node test/plugin.test.mjs" },
+  "dependencies": { "phaseform-cli": "file:../cli" },
+  "peerDependencies": { "vite": ">=5" },
+  "devDependencies": { "vite": "^8.0.0" },
+  "license": "MIT"
+}
