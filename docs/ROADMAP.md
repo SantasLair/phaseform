@@ -26,6 +26,12 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not started.
 8. [ ] First editor integration that exports and imports PHASEFORM, reusing the loader and validator.
 9. [ ] Canvas fallback. Phaser 4 still has a Canvas renderer, and a game configured with `Phaser.AUTO` falls back to it when WebGL is unavailable. WebGL stays the normative target, but a loader running under Canvas should degrade instead of failing: build every object, skip the WebGL-only fields (`tint`, `tintMode`, `filters`) with a warning, and promise no pixel accuracy. First run a Canvas probe and the round-trip examples under `Phaser.CANVAS` to see what renders acceptably (core objects, shapes, text, the four blend modes), then write the rule into the spec.
 
+## Parked ideas
+
+Not planned. Kept here with the evidence, in case a real need appears.
+
+- **Binary encoding.** If a game ever has a level size or load time problem that HTTP compression does not fix (most likely once tilemaps arrive), a release build could write the same document in CBOR ([RFC 8949](https://www.rfc-editor.org/rfc/rfc8949)): a standard, compact encoding with tagged typed arrays for numeric data. Because the document is the data model (see [SPEC.md](SPEC.md#scope)), this would be a mechanical translation with no new meaning. Measured on 2026-10-16: after Brotli, CBOR and MessagePack were about 10% smaller than JSON (7.4 KB against 8.2 KB for 5,000 sprites) but need a decoder of about 11 KB gzipped, while BSON was larger than JSON both raw and compressed.
+
 ## Naming notes
 
 - **npm:** `phaseform` and `phase-form` are unclaimed as of this draft. A scoped package (such as `@scope/phaseform`) is the likely route.

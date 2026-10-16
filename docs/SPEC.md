@@ -23,6 +23,8 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 
 **Target.** Phaser 4 (verified against 4.2.1) with the WebGL renderer. Older Phaser versions and the Canvas renderer are not supported.
 
+**Data model and encoding.** A PHASEFORM document is a data model: objects, arrays, strings, numbers, booleans and null, structured as this spec describes. JSON ([RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)) is its canonical encoding, the one every tool reads and writes. The rules in this spec are rules about the data, not the JSON text: whitespace, formatting and key order carry no meaning.
+
 **Goals**
 
 - **Declarative data only.** No code inside the file. Behavior is referenced by key or script path.
