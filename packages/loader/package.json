@@ -1,8 +1,7 @@
 {
   "name": "phaseform-loader",
-  "version": "0.0.1",
-  "private": true,
-  "description": "Builds PHASEFORM scene documents into objects in a Phaser 4 scene (unpublished reference loader)",
+  "version": "0.1.0",
+  "description": "Builds PHASEFORM scene documents into objects in a Phaser 4 scene (reference loader)",
   "keywords": [
     "phaseform",
     "phaser",
