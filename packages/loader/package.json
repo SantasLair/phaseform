@@ -3,6 +3,26 @@
   "version": "0.0.1",
   "private": true,
   "description": "Builds PHASEFORM scene documents into objects in a Phaser 4 scene (unpublished reference loader)",
+  "keywords": [
+    "phaseform",
+    "phaser",
+    "phaser4",
+    "scene",
+    "loader"
+  ],
+  "homepage": "https://github.com/SantasLair/phaseform#readme",
+  "bugs": {
+    "url": "https://github.com/SantasLair/phaseform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SantasLair/phaseform.git",
+    "directory": "packages/loader"
+  },
+  "files": [
+    "src",
+    "build-global.mjs"
+  ],
   "type": "module",
   "main": "src/index.js",
   "exports": {
@@ -13,5 +33,5 @@
   "peerDependencies": {
     "phaser": "^4.2.1"
   },
-  "license": "MIT"
+  "license": "Apache-2.0"
 }

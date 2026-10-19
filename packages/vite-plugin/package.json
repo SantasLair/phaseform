@@ -3,12 +3,41 @@
   "version": "0.0.1",
   "private": true,
   "description": "Vite plugin that serves a PHASEFORM project as the module virtual:phaseform (unpublished reference plugin)",
+  "keywords": [
+    "phaseform",
+    "phaser",
+    "phaser4",
+    "vite",
+    "vite-plugin"
+  ],
+  "homepage": "https://github.com/SantasLair/phaseform#readme",
+  "bugs": {
+    "url": "https://github.com/SantasLair/phaseform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SantasLair/phaseform.git",
+    "directory": "packages/vite-plugin"
+  },
+  "files": [
+    "src"
+  ],
   "type": "module",
   "main": "src/index.mjs",
-  "exports": { ".": "./src/index.mjs" },
-  "scripts": { "test": "node test/plugin.test.mjs" },
-  "dependencies": { "phaseform-cli": "file:../cli" },
-  "peerDependencies": { "vite": ">=5" },
-  "devDependencies": { "vite": "^8.0.0" },
-  "license": "MIT"
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "scripts": {
+    "test": "node test/plugin.test.mjs"
+  },
+  "dependencies": {
+    "phaseform-cli": "file:../cli"
+  },
+  "peerDependencies": {
+    "vite": ">=5"
+  },
+  "devDependencies": {
+    "vite": "^8.0.0"
+  },
+  "license": "Apache-2.0"
 }

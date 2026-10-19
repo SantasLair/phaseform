@@ -3,6 +3,27 @@
   "version": "0.0.1",
   "private": true,
   "description": "Validates and builds PHASEFORM projects (unpublished reference CLI)",
+  "keywords": [
+    "phaseform",
+    "phaser",
+    "phaser4",
+    "cli",
+    "validate",
+    "scene"
+  ],
+  "homepage": "https://github.com/SantasLair/phaseform#readme",
+  "bugs": {
+    "url": "https://github.com/SantasLair/phaseform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SantasLair/phaseform.git",
+    "directory": "packages/cli"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
   "type": "module",
   "bin": {
     "phaseform": "bin/phaseform.mjs"
@@ -13,7 +34,7 @@
   "scripts": {
     "test": "node test/cli.test.mjs"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     "./project": "./src/project.mjs"
   }
