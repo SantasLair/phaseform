@@ -4,11 +4,11 @@
 
 An open, declarative file format for describing 2D scenes for [Phaser](https://phaser.io) 4.
 
-> Status: **Draft v0.1.** The spec, JSON Schemas and a prototype loader exist. Nothing is stable yet.
+> Status: **Draft v0.1.** The spec, JSON Schemas, a reference toolkit (loader, CLI, Vite plugin), a sample game and a conformance suite exist. The packages are not published yet. Nothing is stable.
 
 ## Why
 
-Phaser has no standard way to save a scene as data, so every editor, tool and game invents its own. PHASEFORM is one shared format that any tool can write and any Phaser project can read. It is a format, not a tool. The project will also provide a small reference toolkit (a runtime loader, a build CLI and a Vite plugin) so the format is easy to adopt, but the spec, not the toolkit, defines the format.
+Phaser has no standard way to save a scene as data, so every editor, tool and game invents its own. PHASEFORM is one shared format that any tool can write and any Phaser project can read. It is a format, not a tool. The project also provides a small reference toolkit (a runtime loader, a build CLI and a Vite plugin, all at 0.0.1 and unpublished) so the format is easy to adopt, but the spec, not the toolkit, defines the format.
 
 ## What it looks like
 
@@ -50,14 +50,14 @@ Every claim about Phaser's behavior is checked by running Phaser 4. As a test, 2
 
 **Useful if** you build a Phaser 4 scene editor, level tool, asset pipeline or exporter, or a game that loads levels as data, and you would rather share a format than invent one.
 
-**Not useful if** you target Phaser 3 or design for the Canvas renderer: PHASEFORM targets Phaser 4 with WebGL. A graceful Canvas fallback, for games that drop to Canvas when WebGL is unavailable, is planned. **Not yet useful if** you need tilemaps or particles. Physics is left to [extensions](docs/SPEC.md#extensions).
+**Not useful if** you target Phaser 3 or design for the Canvas renderer: PHASEFORM targets Phaser 4 with WebGL. A graceful Canvas fallback, for games that drop to Canvas when WebGL is unavailable, is planned but not started. **Not yet useful if** you need tilemaps or particles. Physics is left to [extensions](docs/SPEC.md#extensions).
 
 | | Now | Planned |
 |---|---|---|
 | **Covers** | Images, sprites, text, containers, bitmap text, tile sprites, 7 shapes, filters and masks, sprite animations, scripts, project and asset manifest | Under consideration, not yet scheduled: tilemaps, video, dynamic bitmap text, particles, prefabs |
-| **You get** | Spec, JSON Schemas, examples, prototype loader and serializer, test tools | Loader package, build CLI, Vite plugin, sample game, then conformance tests |
-| **Stability** | Draft v0.1: fields may still change | Stable once the conformance tests exist; semver after that |
-| **Integrating** | Write and read plain JSON; validate with the schemas | Load scenes with the loader package; one build step bundles scripts |
+| **You get** | Spec, JSON Schemas, examples, reference loader (`packages/loader`), build CLI (`packages/cli`), Vite plugin (`packages/vite-plugin`), sample game (`samples/coin-run`), conformance suite (`conformance/`), test tools | Packages published to npm; more conformance cases (bitmap text, remaining shape and filter details); a Canvas fallback |
+| **Stability** | Draft v0.1: fields may still change | Stable once the conformance suite has been checked by an implementation other than the reference loader; semver after that |
+| **Integrating** | Write and read plain JSON; validate with the schemas; load scenes with the loader from a local checkout; build with the CLI or Vite plugin | Install the same packages from npm |
 
 **What it costs you:** the format adds no runtime concepts beyond Phaser's own objects. Your tool keeps its own editor state in a separate sidecar file, and passes through any fields it does not understand.
 
@@ -72,9 +72,9 @@ The detailed plan and open questions are in [docs/ROADMAP.md](docs/ROADMAP.md).
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Open questions and what comes next |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Phaser behavior confirmed by tests |
 | [docs/SURVEY.md](docs/SURVEY.md) | How much of Phaser's examples the core covers |
-| [docs/ROUNDTRIP.md](docs/ROUNDTRIP.md) | Conformance test results |
+| [docs/ROUNDTRIP.md](docs/ROUNDTRIP.md) | Round-trip test results on Phaser's examples |
 
-Schemas are [phaseform.schema.json](phaseform.schema.json) and [phaseform.project.schema.json](phaseform.project.schema.json). Examples are in [examples/](examples/). The test tools and prototype loader are in [verify/](verify/).
+Schemas are [phaseform.schema.json](phaseform.schema.json) and [phaseform.project.schema.json](phaseform.project.schema.json). Examples are in [examples/](examples/). The reference toolkit is in [packages/](packages/), the sample game in [samples/coin-run](samples/coin-run), the conformance suite in [conformance/](conformance/), and the Phaser-behavior test tools in [verify/](verify/).
 
 ## License
 

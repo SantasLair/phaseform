@@ -5,7 +5,7 @@ The code and the specification are openly licensed (see [README](README.md#licen
 ## You may
 
 - **Say your tool supports the format:** "supports PHASEFORM", "imports and exports PHASEFORM", "reads PHASEFORM scenes".
-- **Say your tool is compatible:** "PHASEFORM-compatible". Once the conformance tests exist, use this only if your tool passes them, and say which spec version it supports (for example "PHASEFORM 1.0-compatible").
+- **Say your tool is compatible:** "PHASEFORM-compatible". Use this only if your tool passes the parts of the [conformance suite](conformance/README.md) that apply to it, and say which spec version it supports (for example "PHASEFORM 1.0-compatible").
 - **Refer to the project** in articles, talks, tutorials, documentation and comparisons.
 - **Credit a fork or derived format** with "based on PHASEFORM" or "derived from PHASEFORM", as long as it has its own name.
 
