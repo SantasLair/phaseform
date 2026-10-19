@@ -1,2 +1,8 @@
 node_modules/
 dist/
+*.log
+npm-debug.log*
+survey-shots/
+.DS_Store
+Thumbs.db
+desktop.ini

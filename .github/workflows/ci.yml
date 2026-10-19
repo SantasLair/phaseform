@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Browser tests launch the installed Google Chrome (playwright channel "chrome"),
+      # which ubuntu-latest provides.
+      - name: Install packages
+        run: |
+          npm ci --prefix packages/cli
+          npm ci --prefix packages/vite-plugin
+          npm ci --prefix conformance
+          npm ci --prefix verify
+          npm ci --prefix samples/coin-run
+      - name: Validate schemas and examples
+        run: npm run validate --prefix verify
+      - name: CLI tests
+        run: npm test --prefix packages/cli
+      - name: Vite plugin tests
+        run: npm test --prefix packages/vite-plugin
+      - name: Conformance suite
+        run: npm test --prefix conformance
+      - name: Sample game
+        run: |
+          npm run validate --prefix samples/coin-run
+          npm run build --prefix samples/coin-run
+          npm test --prefix samples/coin-run
