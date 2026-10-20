@@ -7,6 +7,9 @@ export function createLoader(Phaser) {
   const BLEND = { normal: 'NORMAL', add: 'ADD', multiply: 'MULTIPLY', screen: 'SCREEN' };
   const SHAPES = new Set(['rectangle', 'ellipse', 'triangle', 'line', 'polygon', 'star', 'arc']);
   const ALIGN = { left: 0, center: 1, right: 2 };
+  // anchor name -> how much of a size change the object follows: 0 = none (left, top), 0.5 = half (center), 1 = all (right, bottom)
+  const ANCHOR_X = { left: 0, center: 0.5, right: 1 };
+  const ANCHOR_Y = { top: 0, center: 0.5, bottom: 1 };
   const flat = (pts) => pts.flatMap(p => [p.x, p.y]);
   const TINT = { multiply: 'MULTIPLY', fill: 'FILL', add: 'ADD', screen: 'SCREEN', overlay: 'OVERLAY', 'hard-light': 'HARD_LIGHT' };
   const rgb = (c) => parseInt(c.slice(1), 16);
@@ -138,6 +141,7 @@ export function createLoader(Phaser) {
     const scripted = [];
     const byId = new Map();
     const filtered = [];
+    const anchored = [];
     for (const a of (opts && opts.animations) || []) if (!scene.anims.exists(a.key)) scene.anims.create(JSON.parse(JSON.stringify(a)));
 
     function make(d, parent) {
@@ -254,6 +258,13 @@ export function createLoader(Phaser) {
       const p = d.placeholder;
       const ctx = { params: d.params ? JSON.parse(JSON.stringify(d.params)) : {}, size: p && p.width && p.height ? { width: p.width, height: p.height } : null };
       o.setData('phaseform', ctx);
+      if (d.anchor) {
+        const ax = d.anchor.x === undefined ? 'left' : d.anchor.x, ay = d.anchor.y === undefined ? 'top' : d.anchor.y;
+        if (!Object.hasOwn(ANCHOR_X, ax)) throw new Error(`${d.id}: unknown anchor.x "${ax}"`);
+        if (!Object.hasOwn(ANCHOR_Y, ay)) throw new Error(`${d.id}: unknown anchor.y "${ay}"`);
+        if (parent) warnings.push(`${d.id}: anchor ignored on a container child`);
+        else if (ANCHOR_X[ax] || ANCHOR_Y[ay]) anchored.push({ o, x, y, fx: ANCHOR_X[ax], fy: ANCHOR_Y[ay] });
+      }
       byId.set(d.id, o);
       if (d.filters) filtered.push({ o, d });
       if (d.scripts && d.scripts.length) scripted.push({ o, ctx, id: d.id, paths: d.scripts });
@@ -284,7 +295,15 @@ export function createLoader(Phaser) {
       scene.events.on('update', onUpdate);
       scene.events.once('shutdown', () => scene.events.off('update', onUpdate));
     }
-    return { objects: roots, warnings, byId };
+    // Positions anchored root objects for a game of the given size: each keeps its distance from the edge or centre it is
+    // anchored to. Computed from the design position, so calling it again does not drift, and calling it with the scene's
+    // own size puts every object back at its document position. build() does not call it and nothing listens for resizes:
+    // call it after build() and from the game's own resize handler.
+    function layout(width, height) {
+      const dx = width - doc.size.width, dy = height - doc.size.height;
+      for (const a of anchored) { a.o.x = a.x + a.fx * dx; a.o.y = a.y + a.fy * dy; }
+    }
+    return { objects: roots, warnings, byId, layout };
   }
 
   // Queues the loader calls for a project's assets (or only `keys`, a scene entry's asset list). Call from preload().

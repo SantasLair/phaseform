@@ -34,6 +34,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not started.
 
     Written from real use: a real game project built on PHASEFORM hit each of the points above. Open: whether a small MCP server is also worth building. It would offer `validate` with structured results, a headless render of a scene to PNG, and an object tree with world positions. These are the checks an agent cannot cheaply do from a shell. Editing stays plain JSON. See item 8 for the editor.
 
+11. [x] Anchors (draft v0.1): an optional `anchor` on root objects. A scene's `size` is the design size, `x` and `y` stay the position at that size, and `anchor` names the edges an object follows when the game size differs. The reference loader returns `layout(width, height)` from `build`, and the conformance suite has load cases for it. Open: stretching an object to fill the screen, and anchors on container children (they follow their container today).
+
 ## Parked ideas
 
 Not planned. Kept here with the evidence, in case a real need appears.

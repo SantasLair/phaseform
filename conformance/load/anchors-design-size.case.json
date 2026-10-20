@@ -1,0 +1,273 @@
+{
+ "description": "layout at the scene size puts every object back at its document position, even after a different size.",
+ "textures": [],
+ "scene": {
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Anchors",
+  "size": {
+   "width": 400,
+   "height": 300
+  },
+  "objects": [
+   {
+    "id": "plain",
+    "type": "rectangle",
+    "x": 10,
+    "y": 20,
+    "width": 4,
+    "height": 4
+   },
+   {
+    "id": "top-right",
+    "type": "rectangle",
+    "x": 390,
+    "y": 10,
+    "width": 4,
+    "height": 4,
+    "anchor": {
+     "x": "right"
+    }
+   },
+   {
+    "id": "middle",
+    "type": "rectangle",
+    "x": 200,
+    "y": 150,
+    "width": 4,
+    "height": 4,
+    "anchor": {
+     "x": "center",
+     "y": "center"
+    }
+   },
+   {
+    "id": "bottom-left",
+    "type": "rectangle",
+    "x": 10,
+    "y": 290,
+    "width": 4,
+    "height": 4,
+    "anchor": {
+     "y": "bottom"
+    }
+   },
+   {
+    "id": "default-anchor",
+    "type": "rectangle",
+    "x": 30,
+    "y": 40,
+    "width": 4,
+    "height": 4,
+    "anchor": {}
+   },
+   {
+    "id": "corner",
+    "type": "rectangle",
+    "x": 395,
+    "y": 295,
+    "width": 4,
+    "height": 4,
+    "anchor": {
+     "x": "right",
+     "y": "bottom"
+    },
+    "depth": 1
+   },
+   {
+    "id": "panel",
+    "type": "container",
+    "x": 200,
+    "y": 150,
+    "anchor": {
+     "x": "center",
+     "y": "center"
+    },
+    "children": [
+     {
+      "id": "panel-child",
+      "type": "rectangle",
+      "x": 5,
+      "y": 6,
+      "width": 4,
+      "height": 4,
+      "anchor": {
+       "x": "right"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "layout": [
+  {
+   "width": 800,
+   "height": 600
+  },
+  {
+   "width": 400,
+   "height": 300
+  }
+ ],
+ "expect": {
+  "objects": [
+   {
+    "id": "plain",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 10,
+    "y": 20,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "top-right",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 390,
+    "y": 10,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "middle",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 200,
+    "y": 150,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "bottom-left",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 10,
+    "y": 290,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "default-anchor",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 30,
+    "y": 40,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "panel",
+    "type": "Container",
+    "parent": null,
+    "x": 200,
+    "y": 150,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "blendMode": null,
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "panel-child",
+    "type": "Rectangle",
+    "parent": "panel",
+    "x": 5,
+    "y": 6,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   },
+   {
+    "id": "corner",
+    "type": "Rectangle",
+    "parent": null,
+    "x": 395,
+    "y": 295,
+    "scaleX": 1,
+    "scaleY": 1,
+    "rotation": 0,
+    "alpha": 1,
+    "visible": true,
+    "active": true,
+    "originX": 0.5,
+    "originY": 0.5,
+    "fill": null,
+    "stroke": null,
+    "blendMode": "normal",
+    "scrollFactorX": 1,
+    "scrollFactorY": 1
+   }
+  ],
+  "warnings": 1
+ }
+}

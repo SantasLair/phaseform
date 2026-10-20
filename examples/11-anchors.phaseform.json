@@ -1,0 +1,69 @@
+{
+  "format": "phaseform",
+  "version": "0.1.0",
+  "key": "Hud",
+  "size": {
+    "width": 800,
+    "height": 600
+  },
+  "background": "#101820",
+  "objects": [
+    {
+      "id": "title",
+      "type": "text",
+      "text": "Dungeon Run",
+      "x": 400,
+      "y": 40,
+      "origin": { "x": 0.5, "y": 0 },
+      "anchor": { "x": "center", "y": "top" }
+    },
+    {
+      "id": "score",
+      "type": "text",
+      "text": "Score 0",
+      "x": 780,
+      "y": 20,
+      "origin": { "x": 1, "y": 0 },
+      "anchor": { "x": "right" }
+    },
+    {
+      "id": "health-bar",
+      "type": "rectangle",
+      "x": 20,
+      "y": 560,
+      "width": 160,
+      "height": 16,
+      "origin": { "x": 0, "y": 0 },
+      "fill": { "color": "#c0392b" },
+      "anchor": { "y": "bottom" }
+    },
+    {
+      "id": "menu-panel",
+      "type": "container",
+      "x": 400,
+      "y": 300,
+      "anchor": { "x": "center", "y": "center" },
+      "children": [
+        {
+          "id": "menu-bg",
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 240,
+          "height": 120,
+          "fill": { "color": "#2c3e50" }
+        }
+      ]
+    },
+    {
+      "id": "frame",
+      "type": "rectangle",
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 600,
+      "origin": { "x": 0, "y": 0 },
+      "stroke": { "color": "#ffffff", "width": 2 }
+    }
+  ]
+}

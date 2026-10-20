@@ -9,6 +9,7 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Scope](#scope)
 - [Scene document](#scene-document)
 - [Objects](#objects)
+- [Anchors](#anchors)
 - [Tile sprite](#tile-sprite)
 - [Bitmap text](#bitmap-text)
 - [Shapes](#shapes)
@@ -62,12 +63,12 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 | `format` | yes | Always `"phaseform"`. |
 | `version` | yes | Spec version the file was written against (semver). |
 | `key` | yes | Scene key, matching the key used with Phaser's scene manager. |
-| `size` | yes | Game size in pixels (the Phaser game config `width` and `height`). |
+| `size` | yes | Design size in pixels: the size the layout was authored at. For a fixed-size game this is the game size (the Phaser game config `width` and `height`). |
 | `background` | no | Background color as a CSS color string. |
 | `objects` | yes | Ordered list of objects. See [Draw order](#draw-order). |
 | `extensions` | no | Scene-level extension data, keyed by extension name. |
 
-`size` is the game size, and by default the scene camera has the same size. All scenes in one game should agree on it; a loader warns when they differ.
+`size` is the design size. In a game with a fixed size it is the game size, and by default the scene camera has the same size. A game whose size follows its window (Phaser's `Scale.RESIZE` mode) has no single size, so `size` is the size the scene was laid out at, and [anchors](#anchors) say how objects follow the real size. All scenes in one game should agree on it; a loader warns when they differ.
 
 ## Objects
 
@@ -80,7 +81,8 @@ These apply to every object, including containers.
 | `id` | yes | | Unique within the scene. Stable across saves. |
 | `type` | yes | | Object type, see [Core types](#core-types). |
 | `name` | no | `""` | The game object's `name`. |
-| `x`, `y` | no | `0` | Position. |
+| `x`, `y` | no | `0` | Position. At the scene's design `size`; see [Anchors](#anchors) for other sizes. |
+| `anchor` | no | none | Which edges of the game this root object stays pinned to when the game size differs from `size`. See [Anchors](#anchors). |
 | `depth` | no | `0` | Draw order at the scene root. |
 | `alpha` | no | `1` | `0` to `1`. |
 | `visible` | no | `true` | |
@@ -146,7 +148,27 @@ Fields not listed for a type are invalid on that type. Containers have no `origi
 - **`style`.** Phaser's text style config object, passed through unchanged: shadow is nested as `shadow: { offsetX, ... }`, word wrap as `wordWrap: { width, useAdvancedWrap }`, and `padding` goes inside `style`. Phaser's defaults are Courier, 16px, white. A numeric `fontSize` becomes pixels. If `metrics` (`ascent`, `descent`, `fontSize`) is given, Phaser uses it instead of measuring, which changes text height, so it must be preserved. Line spacing is `style.lineSpacing` (pixels, default 0): the Text constructor reads it from the config, although `style.toJSON()` does not return it.
 - **vec2.** `{ "x": number, "y": number }`.
 
-### Tile sprite
+### Anchors
+
+A scene is laid out at its design `size`. When the game runs at a different size (a resizable window, a different device), an object pinned to the right edge or the centre should stay there, not stay at its pixel position. `anchor` says which edges an object follows.
+
+```json
+{ "id": "score", "type": "text", "text": "Score 0", "x": 780, "y": 20, "anchor": { "x": "right", "y": "top" } }
+```
+
+| Field | Values | Default |
+|---|---|---|
+| `anchor.x` | `left`, `center`, `right` | `left` |
+| `anchor.y` | `top`, `center`, `bottom` | `top` |
+
+- **`x` and `y` keep their meaning.** They are always the object's position at the design `size`, anchored or not. A tool or loader that ignores `anchor` therefore draws the scene correctly at the design size, and no stored value is converted when an anchor is added or removed.
+- **The rule.** For an object with a design position `(x, y)`, in a game of size `(w, h)` and a scene `size` of `(W, H)`, the object's position is `x + (ax(w) − ax(W))` and `y + (ay(h) − ay(H))`, where `ax(s)` is `0` for `left`, `s / 2` for `center` and `s` for `right`, and `ay` is the same for `top`, `center` and `bottom`. The object keeps its distance from the chosen edge, or from the centre. With the default anchor, or when `(w, h)` equals `(W, H)`, nothing moves.
+- **Root objects only.** `anchor` applies to objects at the scene root. A container's children follow the container. A loader ignores `anchor` on a child of a container and warns.
+- **Position only.** Anchors do not change scale, rotation, origin, size or draw order. Stretching an object to fill the screen is not part of v0.1.
+- **When it runs.** A loader's `layout(width, height)` applies the rule (see the reference loader). `build` does not call it, and a loader does not watch for resizes: the game calls `layout` after `build` and again from its own resize handler. Calling it again recomputes from the design position, so it does not drift, and it replaces any position a script has set on an anchored object.
+- **The camera is the game's.** Anchors move objects. They do not resize the camera or the background; Phaser's scale manager does that.
+
+## Tile sprite
 
 `tileSprite` repeats a texture across a `width` by `height` area. It has the fields of `image` (`key`, `frame`, `origin`, `scale`, `rotation`, `flipX`, `flipY`, `tint`, `tintMode`, `blendMode`) plus `width` and `height`, which are required, and the texture's offset `tilePosition`, `tileScale` and `tileRotation`. Phaser rounds the size down to a whole number, and treats a size of 0 as "use the frame size", so documents always carry the real size. Moving `tilePosition` scrolls the texture without moving the object, which is how scrolling backgrounds are made.
 

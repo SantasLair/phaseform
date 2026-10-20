@@ -11,6 +11,14 @@ import { build, loadAssets } from 'phaseform-loader';
 // in create():  build(this, sceneDocument)
 ```
 
+Objects can be pinned to the edges or centre of the game with `anchor` (see the spec). `build` returns a `layout(width, height)` function that positions them for the real game size; call it after `build` and from your own resize handler:
+
+```js
+const scene = build(this, sceneDocument);
+scene.layout(this.scale.width, this.scale.height);
+this.scale.on('resize', (size) => scene.layout(size.width, size.height));
+```
+
 `phaser` (^4.2.1) is a peer dependency. The scene and project formats are specified in the [repository](https://github.com/SantasLair/phaseform).
 
 Licensed under Apache-2.0.
