@@ -69,6 +69,7 @@ The detailed plan and open questions are in [docs/ROADMAP.md](docs/ROADMAP.md).
 |---|---|
 | [docs/SPEC.md](docs/SPEC.md) | The scene specification: fields, defaults, draw order, extensions, conformance |
 | [docs/PROJECT.md](docs/PROJECT.md) | The project file: scene list and asset manifest |
+| [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) | For tool makers: what to read, what a writing tool must do, a tested starter example |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Open questions and what comes next |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md) | Phaser behavior confirmed by tests |
 | [docs/SURVEY.md](docs/SURVEY.md) | How much of Phaser's examples the core covers |

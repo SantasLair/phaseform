@@ -168,7 +168,7 @@ A scene is laid out at its design `size`. When the game runs at a different size
 - **When it runs.** A loader's `layout(width, height)` applies the rule (see the reference loader). `build` does not call it, and a loader does not watch for resizes: the game calls `layout` after `build` and again from its own resize handler. Calling it again recomputes from the design position, so it does not drift, and it replaces any position a script has set on an anchored object.
 - **The camera is the game's.** Anchors move objects. They do not resize the camera or the background; Phaser's scale manager does that.
 
-## Tile sprite
+### Tile sprite
 
 `tileSprite` repeats a texture across a `width` by `height` area. It has the fields of `image` (`key`, `frame`, `origin`, `scale`, `rotation`, `flipX`, `flipY`, `tint`, `tintMode`, `blendMode`) plus `width` and `height`, which are required, and the texture's offset `tilePosition`, `tileScale` and `tileRotation`. Phaser rounds the size down to a whole number, and treats a size of 0 as "use the frame size", so documents always carry the real size. Moving `tilePosition` scrolls the texture without moving the object, which is how scrolling backgrounds are made.
 
