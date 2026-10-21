@@ -1,5 +1,5 @@
 {
-  "description": "Building build/project must write exactly these files. Scenes equal the source with every placeholder removed and nothing else changed. The registry lists each script path once, as written in the scenes. A build that finds a missing script writes nothing and reports an error.",
+  "description": "Building build/project must write exactly these files. Scenes equal the source with every placeholder removed and nothing else changed. The registry lists each script path once, as written in the scenes, and exports the scripts' params defaults as `paramDefaults` (empty here: the scripts have no params sidecar). A params sidecar is never written to the output. A build that finds a missing script writes nothing and reports an error.",
   "files": ["assets/hero.png", "phaseform.project.json", "phaseform.registry.js", "scenes/main.phaseform.json", "scripts/bar.js"],
   "registryKeys": ["scripts/bar.js"],
   "removedFields": ["placeholder"],

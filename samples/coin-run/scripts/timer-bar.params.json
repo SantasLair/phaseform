@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "title": "Timer bar",
+  "properties": {
+    "width": { "type": "number", "default": 100, "minimum": 1, "title": "Width", "description": "Full width of the bar in pixels." },
+    "color": { "type": "string", "format": "color", "default": "#ffcc33", "title": "Color" },
+    "seconds": { "type": "number", "default": 5, "minimum": 0.1, "title": "Duration (s)", "description": "Seconds for the bar to drain, then refill." }
+  },
+  "additionalProperties": false
+}

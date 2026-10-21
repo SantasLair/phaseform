@@ -5,6 +5,7 @@ import { dirname, join, relative, resolve, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkProject } from './check-project.mjs';
 import { checkScene } from './check-scene.mjs';
+import { checkObjectParams, defaultsOf, loadParamSchemas } from './check-params.mjs';
 
 // Schemas live at the repository root; a published package would copy them in at pack time.
 const pkg = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -21,7 +22,9 @@ function* walk(objects) {
   }
 }
 
-// Returns { errors, warnings, project, scenes: [{ entry, doc }] }. Script paths that do not resolve to a file are errors.
+// Returns { errors, warnings, notes, project, scenes: [{ entry, doc }], paramDefaults }. Script paths that do not resolve to a file are errors.
+// `paramDefaults` is { script: { key: default } } from the scripts' params sidecars (docs/SPEC.md, "Script params"); params that
+// do not fit a sidecar are warnings, a broken sidecar is an error, and a param with no description is a note.
 // Pass { checkScripts: false } to skip the script-file check (the conformance suite has no script files).
 export function validateProject(projectPath, { checkScripts = true } = {}) {
   const errors = [];
@@ -50,7 +53,18 @@ export function validateProject(projectPath, { checkScripts = true } = {}) {
   }
   const p = checkProject(projectPath);
   errors.push(...p.errors);
-  return { errors, warnings: p.warnings, project, scenes };
+  const warnings = [...p.warnings];
+  const { schemas, errors: sidecarErrors, notes } = loadParamSchemas(root, scriptPaths(scenes));
+  errors.push(...sidecarErrors);
+  for (const { entry, doc } of scenes) {
+    for (const o of walk(doc.objects)) warnings.push(...checkObjectParams(o, schemas).map(m => `${entry.path}: ${m}`));
+  }
+  const paramDefaults = {};
+  for (const [script, schema] of schemas) {
+    const d = defaultsOf(schema);
+    if (Object.keys(d).length) paramDefaults[script] = d;
+  }
+  return { errors, warnings, notes, project, scenes, paramDefaults };
 }
 
 // Schema and scene rules for one scene document. Returns the list of errors.
@@ -58,6 +72,8 @@ export function validateSceneDocument(doc) {
   if (!validateSceneSchema(doc)) return validateSceneSchema.errors.map(e => `${e.instancePath}: ${e.message}`);
   return checkScene(doc).errors;
 }
+
+export { sidecarPath } from './check-params.mjs';
 
 export function scriptPaths(scenes) {
   const paths = new Set();
@@ -75,10 +91,13 @@ export function assetFiles(project) {
   return [...files].sort();
 }
 
-export function registrySource(paths) {
+// `paramDefaults` ({ script: { key: default } }) is written as a named export next to the default export (the modules), for
+// the loader's `paramDefaults` option; only the listed scripts are kept.
+export function registrySource(paths, paramDefaults = {}) {
   const imports = paths.map((p, i) => `import * as s${i} from './${posix.normalize(p)}';`);
   const entries = paths.map((p, i) => `${JSON.stringify(p)}: s${i}`);
-  return `${imports.join('\n')}${imports.length ? '\n' : ''}export default { ${entries.join(', ')} };\n`;
+  const defaults = Object.fromEntries(paths.filter(p => paramDefaults[p]).map(p => [p, paramDefaults[p]]));
+  return `${imports.join('\n')}${imports.length ? '\n' : ''}export const paramDefaults = ${JSON.stringify(defaults)};\nexport default { ${entries.join(', ')} };\n`;
 }
 
 // Removes editor-only data. Only `placeholder` is stripped; everything else is kept.
@@ -95,6 +114,7 @@ const copyInto = (root, out, rel) => {
 };
 
 // Writes the release files to `out`: project file, stripped scenes, assets, scripts and phaseform.registry.js.
+// Params sidecars are not copied: their defaults go into the registry.
 export function buildProject(projectPath, out) {
   const result = validateProject(projectPath);
   if (result.errors.length) return { ...result, written: [] };
@@ -105,7 +125,7 @@ export function buildProject(projectPath, out) {
   for (const { entry, doc } of result.scenes) put(entry.path, JSON.stringify(stripScene(doc), null, 2) + '\n');
   const scripts = scriptPaths(result.scenes);
   for (const s of scripts) { copyInto(root, out, s); written.push(s); }
-  put('phaseform.registry.js', registrySource(scripts));
+  put('phaseform.registry.js', registrySource(scripts, result.paramDefaults));
   for (const a of assetFiles(result.project)) {
     if (!existsSync(join(root, a))) { result.warnings.push(`asset file not found, not copied: ${a}`); continue; }
     copyInto(root, out, a); written.push(a);

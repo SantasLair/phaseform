@@ -2,9 +2,10 @@
 //   project  the project document, with every asset file replaced by the URL Vite serves (hashed in a build)
 //   scenes   { sceneKey: scene document } (placeholders stripped in a build, kept in dev for the editor round trip)
 //   scripts  the script registry: { 'scripts/x.js': module }, generated so the bundler can see every script
+//   paramDefaults  { 'scripts/x.js': { key: default } } from the scripts' params sidecars, for the loader's `paramDefaults` option
 // Editing the project, a scene or a script file reloads the page.
 import { resolve, dirname, join, sep } from 'node:path';
-import { validateProject, scriptPaths, assetFiles, stripScene } from 'phaseform-cli/project';
+import { validateProject, scriptPaths, assetFiles, stripScene, sidecarPath } from 'phaseform-cli/project';
 
 const ID = 'virtual:phaseform';
 const RESOLVED = '\0' + ID;
@@ -28,7 +29,7 @@ export default function phaseform(options = {}) {
 
       const scripts = scriptPaths(r.scenes);
       const files = assetFiles(r.project);
-      watched = new Set([projectPath, ...r.scenes.map(s => join(root, s.entry.path)), ...scripts.map(s => join(root, s))]);
+      watched = new Set([projectPath, ...r.scenes.map(s => join(root, s.entry.path)), ...scripts.map(s => join(root, s)), ...scripts.map(s => join(root, sidecarPath(s)))]);
       for (const f of watched) this.addWatchFile(f);
 
       // each asset file becomes an import, so Vite emits it (and hashes the name in a build)
@@ -47,7 +48,8 @@ export default function phaseform(options = {}) {
         `export const project = ${unquote(JSON.stringify(project))};`,
         `export const scenes = ${JSON.stringify(Object.fromEntries(r.scenes.map(s => [s.entry.key, isBuild ? stripScene(s.doc) : s.doc])))};`,
         `export const scripts = { ${scripts.map((s, i) => `${JSON.stringify(s)}: s${i}`).join(', ')} };`,
-        `export default { project, scenes, scripts };`,
+        `export const paramDefaults = ${JSON.stringify(r.paramDefaults)};`,
+        `export default { project, scenes, scripts, paramDefaults };`,
       ];
       return lines.join('\n');
     },

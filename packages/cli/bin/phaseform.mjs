@@ -12,6 +12,7 @@ if (!file || (cmd !== 'validate' && cmd !== 'build') || (cmd === 'build' && !out
 const projectPath = resolve(file);
 const r = cmd === 'build' ? buildProject(projectPath, resolve(out)) : validateProject(projectPath);
 for (const w of r.warnings) console.warn(`warning: ${w}`);
+for (const n of r.notes ?? []) console.log(`note: ${n}`);
 for (const e of r.errors) console.error(`error: ${e}`);
 if (r.errors.length) { console.error(`${r.errors.length} error(s)`); process.exit(1); }
 console.log(cmd === 'build' ? `built ${r.written.length} file(s) into ${resolve(out)}` : `valid (${r.warnings.length} warning(s))`);

@@ -75,7 +75,7 @@ The detailed plan and open questions are in [docs/ROADMAP.md](docs/ROADMAP.md).
 | [docs/SURVEY.md](docs/SURVEY.md) | How much of Phaser's examples the core covers |
 | [docs/ROUNDTRIP.md](docs/ROUNDTRIP.md) | Round-trip test results on Phaser's examples |
 
-Schemas are [phaseform.schema.json](phaseform.schema.json) and [phaseform.project.schema.json](phaseform.project.schema.json). Examples are in [examples/](examples/). The reference toolkit is in [packages/](packages/), the sample game in [samples/coin-run](samples/coin-run), the conformance suite in [conformance/](conformance/), and the Phaser-behavior test tools in [verify/](verify/).
+Schemas are [phaseform.schema.json](phaseform.schema.json), [phaseform.project.schema.json](phaseform.project.schema.json) and, for a script's params sidecar, [phaseform.script-params.schema.json](phaseform.script-params.schema.json). Examples are in [examples/](examples/). The reference toolkit is in [packages/](packages/), the sample game in [samples/coin-run](samples/coin-run), the conformance suite in [conformance/](conformance/), and the Phaser-behavior test tools in [verify/](verify/).
 
 ## License
 

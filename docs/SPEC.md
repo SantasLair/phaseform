@@ -14,6 +14,7 @@ Behavior that Phaser's documentation leaves unstated is checked by tests and rec
 - [Bitmap text](#bitmap-text)
 - [Shapes](#shapes)
 - [Scripts and code-driven objects](#scripts-and-code-driven-objects)
+  - [Script params](#script-params)
 - [Filters and masks](#filters-and-masks)
 - [Conventions](#conventions)
 - [Extensions](#extensions)
@@ -266,7 +267,44 @@ Some objects have no appearance that data can describe: a health bar redrawn fro
 - `create(obj, scene, ctx)` runs once, after the object and all its siblings exist.
 - `update(obj, scene, time, delta)` runs every frame while the object is active.
 
-`ctx` holds the object's `params` (an empty object when absent) and `size`, the placeholder's `{ width, height }` (`null` when there is no placeholder). The same `ctx` is available later as `obj.getData("phaseform")`. A loader resolves script paths through a script registry and never imports a path itself. How a build produces the registry is in [PROJECT.md](PROJECT.md#release-builds). Any object type may have scripts, not only `graphics`.
+`ctx` holds the object's `params` and `size`, the placeholder's `{ width, height }` (`null` when there is no placeholder). The same `ctx` is available later as `obj.getData("phaseform")`. A loader resolves script paths through a script registry and never imports a path itself. How a build produces the registry is in [PROJECT.md](PROJECT.md#release-builds). Any object type may have scripts, not only `graphics`.
+
+### Script params
+
+A script can describe the `params` it reads in an optional **sidecar** file next to it. The sidecar of `scripts/health-bar.js` is `scripts/health-bar.params.json`: the script path with its last extension replaced by `.params.json`. A scene never names a sidecar, and a script may have none.
+
+The sidecar is a JSON Schema for the `params` object, restricted to the vocabulary below so that an editor can build controls from it without running any code. It is validated by [phaseform.script-params.schema.json](../phaseform.script-params.schema.json).
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "seconds": { "type": "number", "default": 5, "minimum": 0.1, "title": "Duration (s)", "description": "Seconds to drain, then refill." },
+    "color": { "type": "string", "format": "color", "default": "#ffcc33" },
+    "mode": { "enum": ["drain", "fill"], "default": "drain" }
+  },
+  "required": ["seconds"],
+  "additionalProperties": false
+}
+```
+
+| Keyword | Meaning |
+|---|---|
+| `type` | `number`, `integer`, `string`, `boolean`, `object` or `array`. Required unless `enum` is given. |
+| `enum` | The allowed values. An editor shows a drop-down. |
+| `default` | The value used when the object does not set the param. It must itself fit the param's schema. |
+| `minimum`, `maximum` | Bounds, for `number` and `integer`. |
+| `multipleOf` | The step of an editor's number field, for `number` and `integer`. |
+| `format` | `color` only: a string holding `#rrggbb`. |
+| `title`, `description` | Label and hint for editors. **Both are optional.** Without a `title` an editor uses the key as the label; without a `description` it shows no hint. |
+| `required` (on the schema) | Keys that must have a value once defaults are applied. |
+| `additionalProperties` (on the schema) | `false` makes a key no attached script describes a warning, which catches typos. Default `true`. |
+
+Other JSON Schema keywords are allowed and ignored.
+
+**Defaults.** A loader gives each object's `ctx.params` the `default` of every param of its scripts, then the object's own `params` on top. For an object with several scripts, the defaults apply in script order and a later script wins a key they share. Merging is per top-level key: an object's own value replaces a default as a whole, and nested objects are not merged. A loader does not read sidecar files. It receives the defaults, `{ "scripts/x.js": { "key": default } }`, from the build (see [Script registry](PROJECT.md#script-registry)), as the loader's `paramDefaults` option. Without it, `ctx.params` is the object's `params`, or `{}`.
+
+**Checks.** A validator compares each object's params, with defaults applied, to the sidecars of its scripts. These are **warnings**, because `params` is plain JSON that code may read freely: a value that does not fit its param, a `required` key with no value, and (when every attached script has a sidecar with `additionalProperties: false`) a key no sidecar describes. A key counts as described if any attached script's sidecar lists it, and an attached script without a sidecar allows any key. A sidecar that is not valid JSON, breaks the vocabulary above, has a `default` that does not fit its param, or lists a `required` key that is not in `properties` is an **error**. A param with no `description` is only a note.
 
 ### Placeholder
 

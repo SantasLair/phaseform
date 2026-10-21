@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { build } from 'vite';
-import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync, rmSync, cpSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,4 +25,21 @@ assert.ok(js.includes('scripts/bar.js') && js.includes('fillRect'), 'script bund
 assert.ok(/"url": ?[a-z]/i.test(js) || /url: ?[a-z]/i.test(js), 'asset url is an import, not a literal path');
 console.log('PASS vite build bundles scenes, scripts and assets');
 if (process.env.KEEP) console.log(js);
+
+// params sidecars: their defaults reach the bundle as `paramDefaults`
+const pdir = join(tmp, 'project');
+cpSync(fx, pdir, { recursive: true });
+writeFileSync(join(pdir, 'scripts/bar.params.json'), JSON.stringify({ type: 'object', properties: { zork: { type: 'integer', default: 41 } } }));
+const pentry = join(tmp, 'pmain.js');
+writeFileSync(pentry, "import { paramDefaults } from 'virtual:phaseform'; console.log(JSON.stringify(paramDefaults));");
+const pout = join(tmp, 'pdist');
+await build({
+  root: tmp, logLevel: 'silent', plugins: [phaseform({ project: join(pdir, 'phaseform.project.json') })],
+  build: { outDir: pout, minify: false, assetsInlineLimit: 0, rollupOptions: { input: pentry, output: { entryFileNames: 'bundle.js' } } },
+  server: { fs: { strict: false } },
+});
+const pjs = readFileSync(join(pout, 'bundle.js'), 'utf8');
+assert.ok(/zork\"?: ?41/.test(pjs), 'sidecar default bundled as paramDefaults');
+assert.ok(!pjs.includes('bar.params'), 'the sidecar itself is not bundled');
+console.log('PASS vite build bundles params sidecar defaults');
 rmSync(tmp, { recursive: true, force: true });

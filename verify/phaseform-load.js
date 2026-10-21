@@ -1,7 +1,9 @@
 // Prototype PHASEFORM reference loader: PHASEFORM v0.1 scene document -> objects in a live Phaser 4 scene.
 // Follows docs/SPEC.md: defaults, validation of blend/tint names and frames, container draw order, script hooks.
 // build(scene, doc, { modules, animations }) takes modules as { 'scripts/x.js': { create, update } } and the project's
-// animation definitions, which are created in the game's animation manager if missing. The placeholder is ignored.
+// animation definitions, which are created in the game's animation manager if missing. paramDefaults is
+// { 'scripts/x.js': { key: default } }, the defaults from the scripts' params sidecar files (see SPEC.md, Script params).
+// The placeholder is ignored.
 // Phaser is passed in so the module has no import of its own; src/index.js binds it to the installed phaser package.
 window.PhaseformLoader = (function () {
   const Phaser = window.Phaser;
@@ -137,6 +139,7 @@ window.PhaseformLoader = (function () {
 
   function build(scene, doc, opts) {
     const modules = (opts && opts.modules) || {};
+    const paramDefaults = (opts && opts.paramDefaults) || {};
     const warnings = [];
     const ids = new Set();
     const scripted = [];
@@ -257,7 +260,11 @@ window.PhaseformLoader = (function () {
         for (const c of d.children || []) { const child = make(c, o); if (child) o.add(child); }
       }
       const p = d.placeholder;
-      const ctx = { params: d.params ? JSON.parse(JSON.stringify(d.params)) : {}, size: p && p.width && p.height ? { width: p.width, height: p.height } : null };
+      // ctx.params: each attached script's defaults in list order (a later script wins a shared key), then the object's own params
+      const params = {};
+      for (const path of d.scripts || []) Object.assign(params, paramDefaults[path]);
+      Object.assign(params, d.params);
+      const ctx = { params: JSON.parse(JSON.stringify(params)), size: p && p.width && p.height ? { width: p.width, height: p.height } : null };
       o.setData('phaseform', ctx);
       if (d.anchor) {
         const ax = d.anchor.x === undefined ? 'left' : d.anchor.x, ay = d.anchor.y === undefined ? 'top' : d.anchor.y;

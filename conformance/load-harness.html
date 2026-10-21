@@ -24,7 +24,7 @@ window.runCase = (c) => new Promise((resolve) => {
       // module sources are function bodies that return { create, update }, so a case can carry its scripts as plain text
       const modules = {};
       for (const [p, src] of Object.entries(c.modules || {})) modules[p] = new Function(src)();
-      const built = PhaseformLoader.build(this, c.scene, { modules, animations: c.animations || [] });
+      const built = PhaseformLoader.build(this, c.scene, { modules, paramDefaults: c.paramDefaults || {}, animations: c.animations || [] });
       // a case's `layout` is a size, or a list of sizes applied in order, passed to the loader's layout(width, height)
       for (const s of [].concat(c.layout || [])) built.layout(s.width, s.height);
       const ids = new Map([...built.byId].map(([id, o]) => [o, id]));

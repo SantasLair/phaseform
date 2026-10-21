@@ -131,6 +131,13 @@ import * as s1 from './scripts/radar.js';
 export default { 'scripts/health-bar.js': s0, 'scripts/radar.js': s1 };
 ```
 
+- A build also reads each script's [params sidecar](SPEC.md#script-params), if it has one, and writes the defaults as a named export of the registry module, for the loader's `paramDefaults` option:
+
+  ```js
+  export const paramDefaults = { 'scripts/health-bar.js': { "seconds": 5, "color": "#ffcc33" } };
+  ```
+
+  Only scripts that have a sidecar with at least one `default` appear. The sidecar files themselves do not ship.
 - A script path that does not resolve to a file is a build **error**. (At runtime, a path missing from the registry is a warning, as in the scene spec.)
 - The registry is complete before any scene is built, so the loader never waits on an import while building a scene.
 - How the registry is produced is up to the tool. A hand-written registry is also valid.
@@ -139,7 +146,7 @@ export default { 'scripts/health-bar.js': s0, 'scripts/radar.js': s1 };
 
 - A build may remove `placeholder` from every object. Loaders never draw it, so the scene renders the same.
 - A build must not remove anything else. Unknown fields and extension data may be read at runtime.
-- The editor sidecar file never ships.
+- The editor sidecar file never ships, and neither do the scripts' `.params.json` files (their defaults go into the registry).
 - A stripped document must still be valid against the schemas.
 
 ### Packaging

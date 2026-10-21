@@ -19,6 +19,12 @@ scene.layout(this.scale.width, this.scale.height);
 this.scale.on('resize', (size) => scene.layout(size.width, size.height));
 ```
 
+Scripts can have their params described and defaulted by a `.params.json` sidecar (see the spec). The loader reads no files: pass the defaults a build produced (the `paramDefaults` export of the registry, or `virtual:phaseform` with the Vite plugin) next to the script modules:
+
+```js
+build(this, sceneDocument, { modules: scripts, paramDefaults });
+```
+
 `phaser` (^4.2.1) is a peer dependency. The scene and project formats are specified in the [repository](https://github.com/SantasLair/phaseform).
 
 Licensed under Apache-2.0.

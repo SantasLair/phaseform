@@ -4,7 +4,7 @@ PHASEFORM is a draft scene format for Phaser 4 plus a small reference toolkit. I
 
 ## Layout
 
-- `phaseform.schema.json`, `phaseform.project.schema.json`: the JSON Schemas.
+- `phaseform.schema.json`, `phaseform.project.schema.json`, `phaseform.script-params.schema.json`: the JSON Schemas.
 - `docs/`: the specification (`SPEC.md`, `PROJECT.md`) and design notes.
 - `examples/`: valid and invalid example documents.
 - `conformance/`: tests other implementations can run against.

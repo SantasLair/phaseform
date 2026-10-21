@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phaseform.dev/schema/0.1.0/phaseform.script-params.schema.json",
+  "title": "PHASEFORM script params schema",
+  "description": "The sidecar file that describes the params one script reads: scripts/health-bar.js is described by scripts/health-bar.params.json. The file is itself a JSON Schema for the object `params`, restricted to the vocabulary below so that editors can build controls from it without running code. See docs/SPEC.md (Script params).",
+  "type": "object",
+  "properties": {
+    "type": { "const": "object" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "properties": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/param" },
+      "description": "One entry per param key."
+    },
+    "required": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Keys that must have a value after defaults are applied. A missing one is a validation warning."
+    },
+    "additionalProperties": {
+      "type": "boolean",
+      "description": "false makes a key that no attached script's schema knows a validation warning (it catches typos). Default true."
+    }
+  },
+  "required": ["type", "properties"],
+  "additionalProperties": true,
+
+  "$defs": {
+    "param": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["number", "integer", "string", "boolean", "object", "array"] },
+        "enum": { "type": "array", "minItems": 1, "description": "Allowed values; editors show a drop-down." },
+        "default": { "description": "The value used when the scene gives none. The loader copies it into ctx.params." },
+        "title": { "type": "string", "description": "Label for editors. Optional: editors fall back to the key." },
+        "description": { "type": "string", "description": "Hint for editors. Optional." },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "multipleOf": { "type": "number", "exclusiveMinimum": 0, "description": "Step for editors' number fields." },
+        "format": { "const": "color", "description": "A string holding #rrggbb. String params only." }
+      },
+      "anyOf": [{ "required": ["type"] }, { "required": ["enum"] }],
+      "allOf": [
+        { "if": { "required": ["format"] }, "then": { "properties": { "type": { "const": "string" } }, "required": ["type"] } },
+        { "if": { "required": ["minimum"] }, "then": { "properties": { "type": { "enum": ["number", "integer"] } }, "required": ["type"] } },
+        { "if": { "required": ["maximum"] }, "then": { "properties": { "type": { "enum": ["number", "integer"] } }, "required": ["type"] } },
+        { "if": { "required": ["multipleOf"] }, "then": { "properties": { "type": { "enum": ["number", "integer"] } }, "required": ["type"] } }
+      ],
+      "additionalProperties": true
+    }
+  }
+}
